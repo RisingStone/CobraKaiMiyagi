@@ -8,7 +8,7 @@ import java.util.ArrayList;
  * Created by Gareoke on 2/26/16.
  */
 public class Locations {
-    @SerializedName("location") private ArrayList<LatLng> locations;
+    @SerializedName("locations") private ArrayList<LatLng> locations;
 
     public Locations(ArrayList<LatLng> locations) {
         this.locations = locations;

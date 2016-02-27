@@ -6,19 +6,19 @@ import com.google.gson.annotations.SerializedName;
  * Created by Gareoke on 2/26/16.
  */
 public class LatLng {
-    @SerializedName("lat") private String displayName;
-    @SerializedName("lng") private String rideType;
+    @SerializedName("lat") private double lat;
+    @SerializedName("lng") private double lng;
 
-    public LatLng(String displayName, String rideType) {
-        this.displayName = displayName;
-        this.rideType = rideType;
+    public LatLng(double lat, double lng) {
+        this.lat = lat;
+        this.lng = lng;
     }
 
-    public String getDisplayName() {
-        return displayName;
+    public double getLat() {
+        return lat;
     }
 
-    public String getRideType() {
-        return rideType;
+    public double getLng() {
+        return lng;
     }
 }
