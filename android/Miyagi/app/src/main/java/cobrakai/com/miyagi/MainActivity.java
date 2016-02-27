@@ -53,7 +53,7 @@ public class MainActivity extends AppCompatActivity
         navigationView.setNavigationItemSelectedListener(this);
 
         Webservice.fetchGithub();
-        setupMiyagiMap();
+//        setupMiyagiMap();
     }
 
     @Override
