@@ -42,4 +42,12 @@ router.get('/', function(req, res, next) {
 	}
 });
 
+router.post('/', function(req, res, next) {
+	var newDriver = new Driver(req.body);
+	newDriver.save(function(err) {
+		if(err) res.send(500, err);
+		else res.json(req.body);
+	});
+});
+
 module.exports = router;
