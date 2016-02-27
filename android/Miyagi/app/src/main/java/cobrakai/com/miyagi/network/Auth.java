@@ -19,12 +19,12 @@ public class Auth {
         OAuth oauth = new OAuth(activity);
 
         // Initialize the SDK
-        oauth.initialize("Qdtevhvnjsz9J4MUE0243LJZo8jUUAKU");
+        oauth.initialize("mZYzsjep6YhUgove5xONfat34DQ");
 
         oauth.popup("uber", new OAuthCallback() {
             @Override
             public void onFinished(OAuthData data) {
-                Log.d(TAG, data.toString());
+                Log.d(TAG, data.error + data.secret + data.provider + data.state);
             }
         });
 
