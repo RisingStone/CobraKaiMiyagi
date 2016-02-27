@@ -54,9 +54,7 @@ public class MainActivity extends AppCompatActivity
         navigationView.setNavigationItemSelectedListener(this);
 
         Webservice.fetchGithub();
-
         Auth.getAuthToken(this);
-
 //        setupMiyagiMap();
     }
 

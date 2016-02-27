@@ -3,7 +3,7 @@
           xmlns:android="http://schemas.android.com/apk/res/android">
 
     <permission
-        android:name="windylabs.com.hyphen.permission.MAPS_RECEIVE"
+        android:name="cobrakai.com.miyagi.permission.MAPS_RECEIVE"
         android:protectionLevel="signature" />
 
     <uses-permission android:name="com.google.android.providers.gsf.permission.READ_GSERVICES" />
