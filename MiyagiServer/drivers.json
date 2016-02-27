@@ -1,0 +1,72 @@
+[
+  {
+    "name": "Captain Picard",
+    "location": {
+        "type": "Point",
+        "coordinates": [
+          -122.42002129554747,
+          37.76861358957174
+        ]
+      }
+  },
+  {
+    "name": "Hikaru Sulu",
+    "location": {
+        "type": "Point",
+        "coordinates": [
+          -122.42004543542862,
+          37.76887014072296
+        ]
+      }
+  },
+  {
+    "name": "Mr. Spock",
+    "location": {
+        "type": "Point",
+        "coordinates": [
+          -122.42005079984663,
+          37.76895919132769
+        ]
+      }
+  },
+  {
+    "name": "Commander Worf",
+    "location": {
+        "type": "Point",
+        "coordinates": [
+          -122.42015272378922,
+          37.76986453305523
+        ]
+      }
+  },
+  {
+    "name": "Deanna Troy",
+    "location": {
+        "type": "Point",
+        "coordinates": [
+          -122.42144823074341,
+          37.768178934763505
+        ]
+      }
+  },
+  {
+    "name": "Leonard McCoy",
+    "location": {
+        "type": "Point",
+        "coordinates": [
+          -122.42399096488953,
+          37.76802627490758
+        ]
+      }
+  },
+  {
+    "name": "Quark",
+    "location": {
+        "type": "Point",
+        "coordinates": [
+          -122.42655515670776,
+          37.76731385807961
+        ]
+      }
+  }
+]

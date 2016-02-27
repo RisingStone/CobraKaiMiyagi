@@ -1,11 +1,9 @@
 package cobrakai.com.miyagi.network;
 
 import android.app.Activity;
-import android.util.Log;
 
 import io.oauth.OAuth;
 import io.oauth.OAuthCallback;
-import io.oauth.OAuthData;
 
 
 /**
@@ -15,19 +13,12 @@ public class Auth {
 
     private static final String TAG = Auth.class.getSimpleName();
 
-    public static String getAuthToken(final Activity activity){
+    public static void getUberAuthToken(final Activity activity, OAuthCallback callback){
         OAuth oauth = new OAuth(activity);
 
         // Initialize the SDK
-        oauth.initialize("Qdtevhvnjsz9J4MUE0243LJZo8jUUAKU");
+        oauth.initialize("mZYzsjep6YhUgove5xONfat34DQ");
 
-        oauth.popup("uber", new OAuthCallback() {
-            @Override
-            public void onFinished(OAuthData data) {
-                Log.d(TAG, data.toString());
-            }
-        });
-
-        return "";
+        oauth.popup("uber", callback);
     }
 }
