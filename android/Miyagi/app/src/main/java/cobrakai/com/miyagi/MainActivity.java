@@ -3,6 +3,7 @@ package cobrakai.com.miyagi;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.util.Log;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -20,6 +21,8 @@ import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
 
 import butterknife.InjectView;
+import io.oauth.OAuthCallback;
+import io.oauth.OAuthData;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -54,8 +57,13 @@ public class MainActivity extends AppCompatActivity
         navigationView.setNavigationItemSelectedListener(this);
 
         Webservice.fetchGithub();
-        Auth.getAuthToken(this);
-//        setupMiyagiMap();
+        Auth.getUberAuthToken(this, new OAuthCallback() {
+            @Override
+            public void onFinished(OAuthData data) {
+                Log.d(TAG, "Toke: " + data.token);
+            }
+        });
+        setupMiyagiMap();
     }
 
     @Override
