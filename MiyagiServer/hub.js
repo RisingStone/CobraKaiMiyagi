@@ -14,7 +14,7 @@ var HubModel = function() {
     }
   });
   // register the mongoose model
-  mongoose.model('Hub', DriverSchema);
+  mongoose.model('Hub', HubSchema);
 };
 
 // create an export function to encapsulate the model creation

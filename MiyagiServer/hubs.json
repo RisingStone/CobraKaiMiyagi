@@ -1,3 +1,12 @@
 [
-  
+  {
+    "name": "Hikaru Sulu",
+    "location": {
+        "type": "Point",
+        "coordinates": [
+          -122.42004543542862,
+          37.76887014072296
+        ]
+      }
+  }
 ]

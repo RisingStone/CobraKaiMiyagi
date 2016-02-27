@@ -8,6 +8,8 @@ var bodyParser = require('body-parser');
 var mongoose = require('mongoose');
 var driver = require('./driver')();
 var Drivers = mongoose.model('Driver');
+var hub = require('./hub')();
+var Hubs = mongoose.model('Hub');
 
 var fs = require('fs');
 var path = require('path');
@@ -18,12 +20,12 @@ var drivers = require('./routes/drivers');
 mongoose.connect('mongodb://localhost/miyagi_db', function(err) {
   if (err) throw err;
 
-  // load data from file and transform it to Object
-  var data = JSON.parse(fs.readFileSync(path.join(__dirname, 'data.json'), 'utf8'));
+  // load driver data from file and transform it to Object
+  var driverdata = JSON.parse(fs.readFileSync(path.join(__dirname, 'drivers.json'), 'utf8'));
 
   // clean db and load new data
   Drivers.remove(function() {
-    async.each(data, function(item, callback) {
+    async.each(driverdata, function(item, callback) {
       // create a new location
       Drivers.create(item, callback);
     }, function(err) {
@@ -31,6 +33,18 @@ mongoose.connect('mongodb://localhost/miyagi_db', function(err) {
     });
   });
 
+  // load driver data from file and transform it to Object
+  var hubdata = JSON.parse(fs.readFileSync(path.join(__dirname, 'hubs.json'), 'utf8'));
+
+  // clean db and load new data
+  Hubs.remove(function() {
+    async.each(hubdata, function(item, callback) {
+      // create a new location
+      Hubs.create(item, callback);
+    }, function(err) {
+      if (err) throw err;
+    });
+  });
 });
 
 var app = express();
