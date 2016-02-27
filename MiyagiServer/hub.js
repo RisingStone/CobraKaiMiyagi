@@ -6,13 +6,12 @@ var Schema = mongoose.Schema;
 var HubModel = function() {
   var HubSchema = new Schema({
     name: String,
-    location: {
-    	type: {
-    		type: String
-    	},
-    	coordinates: [Number]
+    area: {
+    	type: { type: String },
+    	coordinates: { type: Array }
     }
   });
+  HubSchema.index({ area: '2dsphere' });
   // register the mongoose model
   mongoose.model('Hub', HubSchema);
 };
