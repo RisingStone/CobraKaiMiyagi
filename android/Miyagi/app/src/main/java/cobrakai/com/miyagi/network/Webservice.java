@@ -2,8 +2,10 @@ package cobrakai.com.miyagi.network;
 
 import android.util.Log;
 
+import cobrakai.com.miyagi.models.lyft.Drivers;
 import cobrakai.com.miyagi.models.lyft.EstimatedTime;
 import cobrakai.com.miyagi.models.lyft.EstimatedTimeObject;
+import cobrakai.com.miyagi.models.lyft.NearbyDrivers;
 import cobrakai.com.miyagi.models.uber.UberModel;
 import cobrakai.com.miyagi.utils.Constants;
 import retrofit.RestAdapter;
@@ -104,9 +106,49 @@ public class Webservice {
                 });
     }
 
+    public static void fetchDriverLocation() {
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(Constants.LYFT_BASE_URL)
+                .addConverterFactory(GsonConverterFactory.create())
+                .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
+                .build();
+
+        Webservice.Get webservice = retrofit.create(Webservice.Get.class);
+
+        Observable<NearbyDrivers> estimatedTimeRxCall = webservice.lyftDriversLocation(Constants.LYFT_ACCESS_TOKEN_SANDBOX, Constants.MOCK_LAT, Constants.MOCK_LNG);
+        estimatedTimeRxCall
+                .subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Subscriber<NearbyDrivers>() {
+                    @Override
+                    public void onCompleted() {
+
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+
+                    }
+
+                    @Override
+                    public void onNext(NearbyDrivers nearbyDrivers) {
+                        for(Drivers driver : nearbyDrivers.getNearbyDrivers()){
+                            Log.d(TAG, "driver rideType: " + driver.getRideType());
+                        }
+                    }
+                });
+    }
+
     public interface Get {
         @retrofit2.http.GET(Constants.LYFT_ESTIMATED_TIME)
         Observable<EstimatedTime> lyftEstimatedTime(
+                @Header("Authorization") String authorization,
+                @Query("lat") String lat,
+                @Query("lng") String lng
+        );
+
+        @retrofit2.http.GET(Constants.LYFT_DRIVERS_LOCATION)
+        Observable<NearbyDrivers> lyftDriversLocation(
                 @Header("Authorization") String authorization,
                 @Query("lat") String lat,
                 @Query("lng") String lng

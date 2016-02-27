@@ -3,6 +3,7 @@ package cobrakai.com.miyagi;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.util.Log;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -13,6 +14,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import butterknife.ButterKnife;
 import cobrakai.com.miyagi.network.Auth;
 import cobrakai.com.miyagi.network.Webservice;
 import com.google.android.gms.maps.GoogleMap;
@@ -25,13 +27,14 @@ public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
     private static final String TAG = MainActivity.class.getSimpleName();
-    @InjectView(R.id.map_view)
-    MapView miyagiMap;
+    @InjectView(R.id.map_view) MapView miyagiMap;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        ButterKnife.inject(this);
+
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -55,7 +58,9 @@ public class MainActivity extends AppCompatActivity
 
         Webservice.fetchGithub();
         Auth.getAuthToken(this);
-//        setupMiyagiMap();
+        setupMiyagiMap(savedInstanceState);
+
+        Webservice.fetchDriverLocation();
     }
 
     @Override
@@ -115,12 +120,45 @@ public class MainActivity extends AppCompatActivity
         return true;
     }
 
-    private void setupMiyagiMap() {
-        miyagiMap.getMapAsync(new OnMapReadyCallback() {
+    private void setupMiyagiMap(Bundle savedInstanceState) {
+        miyagiMap
+                .getMapAsync(new OnMapReadyCallback() {
             @Override
-            public void onMapReady(GoogleMap googleMap) {
-
+            public void onMapReady(GoogleMap map) {
+                try {
+                    map.getUiSettings().setMyLocationButtonEnabled(true);
+                    map.setMyLocationEnabled(Boolean.TRUE);
+                    map.setMapType(GoogleMap.MAP_TYPE_NORMAL);
+                } catch (SecurityException e){
+                    Log.e(TAG, "SecurityException -- START -- " + e.toString());
+                }
             }
         });
+
+        miyagiMap.onCreate(savedInstanceState);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        miyagiMap.onResume();
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        miyagiMap.onPause();
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        miyagiMap.onDestroy();
+    }
+
+    @Override
+    public void onLowMemory() {
+        super.onLowMemory();
+        miyagiMap.onLowMemory();
     }
 }

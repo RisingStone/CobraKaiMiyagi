@@ -7,6 +7,7 @@ public class Constants {
     //Lyft Constants
     public static final String LYFT_BASE_URL = "https://api.lyft.com/v1/";
     public static final String LYFT_ESTIMATED_TIME = "eta";
+    public static final String LYFT_DRIVERS_LOCATION = "drivers";
     public static final String LYFT_CLIENT_ID = "BBLCVdMuy1UF";
     public static final String LYFT_CLIENT_SECRET = "Q5GpCDF8_YRGA47ajRhjZIYuInNNjyFU";
 
