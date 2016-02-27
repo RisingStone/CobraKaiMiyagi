@@ -13,6 +13,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import cobrakai.com.miyagi.network.Auth;
 import cobrakai.com.miyagi.network.Webservice;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
@@ -53,6 +54,8 @@ public class MainActivity extends AppCompatActivity
         navigationView.setNavigationItemSelectedListener(this);
 
         Webservice.fetchGithub();
+
+        Auth.getAuthToken(this);
 
 //        setupMiyagiMap();
     }
