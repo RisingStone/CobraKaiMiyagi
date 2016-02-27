@@ -1,4 +1,4 @@
-package cobrakai.com.miyagi.network;
+package cobrakai.com.miyagi.models.uber;
 
 /**
  * Created by m.stanford on 2/26/16.

@@ -2,6 +2,7 @@ package cobrakai.com.miyagi.network;
 
 import android.util.Log;
 
+import cobrakai.com.miyagi.models.uber.UberModel;
 import retrofit.RestAdapter;
 import retrofit.http.GET;
 import retrofit.http.Path;
