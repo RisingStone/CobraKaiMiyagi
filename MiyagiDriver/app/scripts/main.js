@@ -4,6 +4,7 @@ var map;
 var driverid;
 var hubId = "56d35a97e6087451433f0ecb";
 var hubList;
+var hub;
 
 var shouldLoop = true;
 
@@ -300,22 +301,19 @@ var iconIds = ["first", "second", "third", "fourth", "fifth", "sixth", "seventh"
 function updateQueue(json){
 	
 	hub = json;
+	
+	for(var i = 0; i < hub.riders.length; i++){
+		var hubRiderPostion = hub.riders[i];
+		$('#r'+iconIds[i]).text(hubDriverPositon.name);
+	}
 			
-	for(var i = 0; i < iconIds.length; i++){
-		
-		//Check hub position of i.
-		var hubDriverPositon;
-		var hubRiderPostion;
-		
-		//Update riders
-		$('#r'+iconIds[i]).text(iconIds[i]);
-		
-		//Update drivers
-		$('#d'+iconIds[i]).text(iconIds[i]);	
+	for(var i = 0; i < hub.drivers.length; i++){
+		var hubDriverPositon = hub.drivers[i];
+		$('#d'+iconIds[i]).text(hubRiderPostion.name);	
 	}
 	
 	//Check hub driver position 1, if it's our ID, then let's put up an accept thing
-	if(hub.riderQueue.id == driver.name){
+	if(hub.riders == driver.name){
 		createAlertRideAccept();
 	}
 }
@@ -347,7 +345,7 @@ $('#hubs').on('click', function () {
 
 $('#hub').on('click', function () {
 	shouldLoop = true;
-	setTimeout(mainLoop, 1000);
+	setTimeout(mainLoop, 2000);
 });
 
 $('#stop').on('click', function () {
@@ -355,7 +353,7 @@ $('#stop').on('click', function () {
 });
 
 function mainLoop() {
-	queryHub(hubId);
+	queryHub(hubList[0]._id);
 	if(shouldLoop)
-		setTimeout(mainLoop, 1000);
+		setTimeout(mainLoop, 2000);
 }
