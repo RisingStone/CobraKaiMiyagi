@@ -110,22 +110,29 @@ body {
 	}
 	
 	#driverQueue {
+		background: #FFFFFF;
 		position: absolute;	
-		top: 350px;
-		left: 200px;
+		top: 30%;
+		left: 4%;
 	}
 	
 	#riderQueue {
+		background: #FFFFFF;
 		position: absolute;	
-		top: 350px;
-		left: 100px;
+		top: 30%;
+		left: 10%;
 	}
 	
-	.queuePosition {
+	.container.queuePosition {
 		height: 35px;
-		width: 35px;
+		width: 75px;
 		border-style: solid;
 		border-width: 2px;
-		border-radius: 30px;
+	}
+	
+	.btn-group-vertical {
+		position: absolute;	
+		bottom: 20px;
+		width: 20%;
 	}
 }
