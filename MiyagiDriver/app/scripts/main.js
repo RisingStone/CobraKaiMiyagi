@@ -1,3 +1,7 @@
+window.onload = function(){
+	getDriverLocation();
+}
+
 var map;
 var driverid;
 
@@ -11,6 +15,8 @@ var driver = {
 		coordinates: [37.807798, -122.431253]
 	}
 }
+
+var hub;
 
 function initMap() {
 	var myLatlng = new google.maps.LatLng(driver.location.coordinates[0], driver.location.coordinates[1]);
@@ -182,7 +188,7 @@ function createAlertRideAccept(){
 			acceptRide();
 		})
 		
-		$('.ale').on('close.bs.alert', function () {
+		$('.alert').on('close.bs.alert', function () {
 			rejectRide();
 		})
 }
@@ -199,5 +205,32 @@ function acceptRide(){
 	console.log('Ride accepted!');	
 }
 
-getDriverLocation();
-createAlertRideAccept();
+var iconIds = ["first", "second", "third", "fourth", "fifth", "sixth", "seventh", "eighth", "ninth", "tenth"];
+
+function updateQueue(){
+	for(var i = 0; i < iconIds.length; i++){
+		
+		//Check hub position of i.
+		var hubDriverPositon;
+		var hubRiderPostion;
+		
+		//Update riders
+		$('#r'+iconIds[i]).text('rider');
+		
+		//Update drivers
+		$('#d'+iconIds[i]).text('driver');	
+	}
+	
+	//Check hub driver position 1, if it's our ID, then let's put up an accept thing
+	if(hub.riderQueue.id == driver.name){
+		createAlertRideAccept();
+	}
+}
+
+function mainLoop() {
+    console.log("10 seconds");
+	updateQueue();
+    setTimeout(mainLoop, 250);
+}
+
+setTimeout(mainLoop, 250);
