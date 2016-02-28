@@ -144,7 +144,6 @@ router.delete('/:hub_id/top', function(req, res, next) {
 	  	return res.json(404, err);
 	  }
 
-	  console.log("My hub: ", hub);
 	  if(hub.riders.length == 0) {
 	  	return res.send(404, "No rider in queue");
 	  }
