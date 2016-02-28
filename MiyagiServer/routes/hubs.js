@@ -225,6 +225,39 @@ router.delete('/:hub_id/top', function(req, res, next) {
 });
 
 //
+// FATAL: For Mark's web app only: Dequeue rider & driver pair from FIFO queue on existing hub
+//
+router.get('/:hub_id/top', function(req, res, next) {
+	var hub_id = req.params.hub_id;
+	console.log('Removing top rider from hub_id ' + hub_id);
+	
+	Hub.findOne({ "_id": hub_id }, function (err, hub){
+	  if (err || !hub) {
+	  	console.error('Where is my hub? ', err);
+	  	return res.json(404, "No hub");
+	  }
+
+	  if(hub.riders.length == 0) {
+	  	return res.send(404, "No rider in queue");
+	  }
+
+	  if(hub.drivers.length == 0) {
+	  	return res.send(404, "No driver in queue");
+	  }
+
+	  // Dequeue pair
+	  var rider = hub.riders.shift();
+	  var driver = hub.drivers.shift();
+  	  hub.save(function(err) {
+		if(err)
+			res.send(500, err);
+		else
+			res.send(200, "['" + rider + "','" + driver + "']");
+  	  });
+	});
+});
+
+//
 // Remove rider from existing hub
 //
 router.delete('/:hub_id/riders/:rider', function(req, res, next) {
