@@ -3,7 +3,9 @@ var router = express.Router();
 var mongoose = require('mongoose');
 var Hub = mongoose.model('Hub');
 
-/* GET all hubs, or only hubs within given distance of a lat/long pair */
+//
+// GET all hubs, or only hubs within given distance of a lat/long pair
+//
 router.get('/', function(req, res, next) {
 	var limit = req.query.limit || 100;
 
@@ -42,6 +44,9 @@ router.get('/', function(req, res, next) {
 	}
 });
 
+//
+// Create new hub
+// 
 router.post('/', function(req, res, next) {
 	console.log('Creating hub...');
 	var newHub = new Hub(req.body);
@@ -55,32 +60,137 @@ router.post('/', function(req, res, next) {
 	});
 });
 
+//
+// Update visibility of existing hub
+//
 router.put('/:hub_id', function(req, res, next) {
 	var hub_id = req.params.hub_id;
 	console.log('Updating hub ' + hub_id);
 
 	Hub.findOne({ _id: hub_id }, function (err, hub){
-	  if (err)
-	  	return res.json(500, err);
+	  if (err) {
+	  	console.error('Where is my hub? ', err);
+	  	return res.json(404, err);
+	  }
 
-	  var changed = false;
-	  if(req.body.name) {
-	  	hub.name = req.body.name;
-	  	changed = true;
-	  }
-	  if(req.body.visible) {
+	  // is the boolean property defined	  
+	  if(typeof req.body.visible !== "undefined") {
+	  	if(!req.body.visible && hub.visible && hub.riders.length > 0) {
+	  		// Keep lights on while riders are in queue
+	  		return res.send(403, "Riders in queue, can't shutdown");
+	  	}
 	  	hub.visible = req.body.visible;
-	  	changed = true;
-	  }
-	  if(changed) {
-		  hub.save(function(err) {
+	  	hub.save(function(err) {
 			if(err)
 				res.send(500, err);
 			else
 				res.json(req.body);
-		  });
+	  	});
 	  } else {
 	  	return res.send(200, "No changes");
+	  }
+	});
+});
+
+//
+// Add rider to existing hub's FIFO queue
+//
+router.post('/:hub_id/riders/:rider', function(req, res, next) {
+	var hub_id = req.params.hub_id;
+	var rider = req.params.rider;
+	console.log('Adding rider ' + rider + ' to hub_id ' + hub_id);
+	
+	Hub.findOne({ _id: hub_id }, function (err, hub){
+	  if (err) {
+	  	console.error('Where is my hub? ', err);
+	  	return res.json(404, err);
+	  }
+
+	  if(rider) {
+	  	var i = 0;
+	  	// Ensure only unique riders in queue
+	  	for(; i < hub.riders.length; i++) {
+	  		if(hub.riders[i] === rider) {
+	  			console.log('Re-queuing rider ' + rider);
+	  			hub.riders.splice(i, 1); // In-place removal
+	  			break;
+	  		}
+	  	}
+	  	// Enqueue given rider
+	  	hub.riders.push(rider);
+
+	  	hub.save(function(err) {
+			if(err)
+				res.send(500, err);
+			else
+				res.send(200);
+	  	});
+	  } else {
+	  	return res.send(400, "No rider");
+	  }
+	});
+});
+
+//
+// Dequeue rider from FIFO queue on existing hub
+//
+router.delete('/:hub_id/top', function(req, res, next) {
+	var hub_id = req.params.hub_id;
+	console.log('Removing top rider from hub_id ' + hub_id);
+	
+	Hub.findOne({ _id: hub_id }, function (err, hub){
+	  if (err) {
+	  	console.error('Where is my hub? ', err);
+	  	return res.json(404, err);
+	  }
+
+	  if(hub.riders.length == 0) {
+	  	return res.send(404, "No rider in queue");
+	  }
+
+	  // Dequeue rider
+	  var rider = hub.riders.shift();
+  	  hub.save(function(err) {
+		if(err)
+			res.send(500, err);
+		else
+			res.send(200);
+  	  });
+	});
+});
+
+//
+// Remove rider from existing hub
+//
+router.delete('/:hub_id/riders/:rider', function(req, res, next) {
+	var hub_id = req.params.hub_id;
+	var rider = req.params.rider;
+	console.log('Removing rider ' + rider + ' from hub_id ' + hub_id);
+	
+	Hub.findOne({ _id: hub_id }, function (err, hub){
+	  if (err) {
+	  	console.error('Where is my hub? ', err);
+	  	return res.json(404, err);
+	  }
+
+	  if(rider) {
+	  	var i = 0;
+	  	// Ensure only unique riders in queue
+	  	for(; i < hub.riders.length; i++) {
+	  		if(hub.riders[i] === rider) {
+	  			console.log('Re-queuing rider ' + rider);
+	  			hub.riders.splice(i, 1); // In-place removal
+	  			hub.save(function(err) {
+					if(err)
+						res.send(500, err);
+					else
+						res.send(200);
+			  	});
+	  			break;
+	  		}
+	  	}
+	  } else {
+	  	return res.send(400, "No rider");
 	  }
 	});
 });
