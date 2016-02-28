@@ -21,6 +21,7 @@ var hubs = require('./routes/hubs');
 mongoose.connect('mongodb://localhost/miyagi_db', function(err) {
   if (err) throw err;
 
+  /*
   // load driver data from file and transform it to Object
   var driverdata = JSON.parse(fs.readFileSync(path.join(__dirname, 'drivers.json'), 'utf8'));
 
@@ -33,6 +34,7 @@ mongoose.connect('mongodb://localhost/miyagi_db', function(err) {
       if (err) throw err;
     });
   });
+  */
 
   // load driver data from file and transform it to Object
   var hubdata = JSON.parse(fs.readFileSync(path.join(__dirname, 'hubs.json'), 'utf8'));
@@ -48,6 +50,10 @@ mongoose.connect('mongodb://localhost/miyagi_db', function(err) {
   });
 });
 
+var allowCrossDomain = function(req, res, next) {
+    res.header('Access-Control-Allow-Origin', '*');
+    next();
+}
 var app = express();
 
 // view engine setup
@@ -60,6 +66,7 @@ app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
+app.use(allowCrossDomain);
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', routes);
