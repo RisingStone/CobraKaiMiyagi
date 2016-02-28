@@ -2,6 +2,7 @@
   {
     "name": "Club Hub",
     "visible": true,
+    "riders":[],
     "area": {
         "type": "Polygon",
         "coordinates": [

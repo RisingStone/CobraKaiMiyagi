@@ -46,8 +46,42 @@ router.post('/', function(req, res, next) {
 	console.log('Creating hub...');
 	var newHub = new Hub(req.body);
 	newHub.save(function(err) {
-		if(err) res.send(500, err);
-		else res.json(req.body);
+		if(err) {
+			console.log(err);
+			res.send(500, err);
+		} else {
+			res.json(req.body);
+		}
+	});
+});
+
+router.put('/:hub_id', function(req, res, next) {
+	var hub_id = req.params.hub_id;
+	console.log('Updating hub ' + hub_id);
+
+	Hub.findOne({ _id: hub_id }, function (err, hub){
+	  if (err)
+	  	return res.json(500, err);
+
+	  var changed = false;
+	  if(req.body.name) {
+	  	hub.name = req.body.name;
+	  	changed = true;
+	  }
+	  if(req.body.visible) {
+	  	hub.visible = req.body.visible;
+	  	changed = true;
+	  }
+	  if(changed) {
+		  hub.save(function(err) {
+			if(err)
+				res.send(500, err);
+			else
+				res.json(req.body);
+		  });
+	  } else {
+	  	return res.send(200, "No changes");
+	  }
 	});
 });
 
