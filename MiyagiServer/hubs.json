@@ -39,6 +39,7 @@
         ]
       }
   },
+  {
       "name": "Ferry Building Hub",
       "visible": true,
       "riders":[],
@@ -68,7 +69,9 @@
             ]
           ]
         ]
-      },
+      }
+    },
+      {
 	"name": "4th and King Caltrain Station Hub",
 	"visible": true,
 	"riders":[],
@@ -106,7 +109,9 @@
               ]
             ]
           ]
-      },
+      }
+    },
+      {
         "name": "The Armory Club Hub",
         "visible": true,
         "riders":[],
@@ -136,10 +141,12 @@
               ]
             ]
           ]
-      },
+      }
+    },
+      {
         "name": "El Rio Hub",
         "visible": true,
-        "riders":[],
+        "riders":["Atha", "Addie"],
         "area":{
           "type": "Polygon",
           "coordinates": [
@@ -167,4 +174,5 @@
             ]
           ]
       }
+    }
 ]
