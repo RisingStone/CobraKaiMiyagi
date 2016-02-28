@@ -110,13 +110,13 @@ function registerDriver(driver){
 		// Code to run if the request succeeds;
 		// the response is passed to the function
 		success: function( json ) {
-			$("#output").append(json);
+			console.log(json);
 		},
 	
 		// Code to run if the request fails; the raw request and
 		// status codes are passed to the function
 		error: function( xhr, status, errorThrown ) {
-			$("#output").append("Sorry, there was a problem!" );
+			console.error("Sorry, there was a problem!");
 		},
 	
 		// Code to run regardless of success or failure
@@ -142,13 +142,13 @@ function queryHub(){
 		// Code to run if the request succeeds;
 		// the response is passed to the function
 		success: function( json ) {
-			$("#output").append(json);
+			console.log(json);
 		},
 	
 		// Code to run if the request fails; the raw request and
 		// status codes are passed to the function
 		error: function( xhr, status, errorThrown ) {
-			$("#output").append("Sorry, there was a problem!" );
+			console.error("Sorry, there was a problem!");
 		},
 	
 		// Code to run regardless of success or failure
@@ -159,27 +159,44 @@ function queryHub(){
 
 function createAlertRideAccept(){
 		var alertMarkup = '\
-		<div class="alert alert-danger alert-dismissible fade in" role="alert">\
+		<div class="alert alert-success alert-dismissible fade in" role="alert">\
 			<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">×</span></button>\
 			<h4>Accept Ride?</h4>\
 			<p>Top of queue reached.</p>\
-			<p><button type="button" class="btn btn-danger">Accept Ride</button> <button type="button" class="btn btn-default">Leave Queue</button></p>\
+			<p><button type="button" class="btn btn-success">Accept Ride</button> <button type="button" class="btn btn-danger">Leave Queue</button></p>\
 		</div>\
 		';
 	
 		var bootstrap_alert = function() {}
+		
 		bootstrap_alert.warning = function(message) {
             $('#alert_placeholder').html(alertMarkup);
         }
 		bootstrap_alert.warning("Here is my Alert!");
 		
-		$('#alert_placeholder').on('btn.btn-default', function () {
-			console.log("Alert button pressed!");
+		$('.btn.btn-danger').on('click', function () {
+			rejectRide();
 		})
 		
-		$('#alert_placeholder').on('btn.btn-danger', function () {
-			console.log("Alert button pressed!");
+		$('.btn.btn-success').on('click', function () {
+			acceptRide();
 		})
+		
+		$('.ale').on('close.bs.alert', function () {
+			rejectRide();
+		})
+}
+
+function rejectRide(){
+	$('.close').alert('close');
+	
+	console.log('Ride rejected!');
+}
+
+function acceptRide(){
+	$('.close').alert('close');
+
+	console.log('Ride accepted!');	
 }
 
 getDriverLocation();
