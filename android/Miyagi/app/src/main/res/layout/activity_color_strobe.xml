@@ -1,8 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/color_strobe"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="cobrakai.com.miyagi.views.ColorStrobe"
+    tools:context="cobrakai.com.miyagi.views.ColorStrobeActivity"
     android:background="@android:color/holo_blue_dark">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:scaleType="fitXY"
+            android:adjustViewBounds="true"
+            android:layout_margin="50dp"
+            android:src="@drawable/waxon"
+            android:layout_centerInParent="true"/>
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:scaleType="fitXY"
+            android:adjustViewBounds="true"
+            android:src="@drawable/pickedup"
+            android:layout_alignParentBottom="true"/>
+    </RelativeLayout>
 </FrameLayout>

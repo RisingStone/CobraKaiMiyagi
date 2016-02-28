@@ -4,6 +4,8 @@ import com.google.gson.annotations.SerializedName;
 
 import java.util.ArrayList;
 
+import cobrakai.com.miyagi.models.general.LatLng;
+
 /**
  * Created by Gareoke on 2/26/16.
  */

@@ -2,6 +2,7 @@ package cobrakai.com.miyagi;
 
 import android.content.Intent;
 import android.graphics.Typeface;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
@@ -21,13 +22,22 @@ import android.widget.Button;
 import butterknife.ButterKnife;
 import cobrakai.com.miyagi.network.Auth;
 import cobrakai.com.miyagi.network.Webservice;
+
+import com.google.android.gms.maps.CameraUpdate;
+import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
+
+import java.util.ArrayList;
 
 import butterknife.InjectView;
+import cobrakai.com.miyagi.service.EnteringGeoFenceService;
+import cobrakai.com.miyagi.views.LocationActivity;
 import io.oauth.OAuthCallback;
 import io.oauth.OAuthData;
 import cobrakai.com.miyagi.utils.Constants;
@@ -37,11 +47,20 @@ import cobrakai.com.miyagi.views.ColorStrobeActivity;
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
+    private static final int REQUEST_DESTINATION = 0;
+
     private static final String TAG = MainActivity.class.getSimpleName();
     @InjectView(R.id.map_view) MapView miyagiMap;
-    @InjectView(R.id.request_ride_btn) Button miyagiButton;
+    @InjectView(R.id.request_ride_btn) Button miyagiRequestButton;
+    @InjectView(R.id.miyagi_fab) FloatingActionButton miyagiFAB;
+
+    ArrayList<String> miyagiQuotes;
 
     private static BitmapDescriptor markerIcon;
+    private static BitmapDescriptor hubIcon;
+    private static GoogleMap map;
+
+    private int miyagiCycleCouter = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,23 +77,26 @@ public class MainActivity extends AppCompatActivity
         drawer.setDrawerListener(toggle);
         toggle.syncState();
 
-
-
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-        Auth.getUberAuthToken(this, new OAuthCallback() {
-            @Override
-            public void onFinished(OAuthData data) {
-                Log.d(TAG, "Toke: " + data.token);
-            }
-        });
+        miyagiQuotes = new ArrayList<>();
+        setupMiyagiQuotes();
+
+//        Auth.getUberAuthToken(this, new OAuthCallback() {
+//            @Override
+//            public void onFinished(OAuthData data) {
+//                Log.d(TAG, "Toke: " + data.token);
+//            }
+//        });
 
         setupMiyagiMap(savedInstanceState);
 
         markerIcon = BitmapDescriptorFactory.fromResource(R.drawable.car);
+        hubIcon = BitmapDescriptorFactory.fromResource(R.drawable.geofence);
         Helper.setupActionBar(this, getResources().getString(R.string.app_name));
         setupUI();
+        setupListeners();
     }
 
     @Override
@@ -143,11 +165,31 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void onMapReady(GoogleMap map) {
                 try {
+                    MainActivity.map = map;
                     map.getUiSettings().setMyLocationButtonEnabled(true);
                     map.setMyLocationEnabled(Boolean.TRUE);
                     map.setMapType(GoogleMap.MAP_TYPE_NORMAL);
 
-                    Webservice.fetchDriverLocation(map, markerIcon, Constants.LYFT_ACCESS_TOKEN_SANDBOX);
+//                    Webservice.fetchDriverInitialLocation(map, hubIcon, Constants.LYFT_ACCESS_TOKEN);
+//                    Webservice.fetchMockHubLocation(map, hubIcon, Constants.LYFT_ACCESS_TOKEN);
+                    Webservice.fetchKreeseLocation(map, hubIcon, MainActivity.this);
+                    Webservice.testMyLocalHost();
+
+                    CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(
+                            new LatLng(Double.valueOf(Constants.MOCK_LAT), Double.valueOf(Constants.MOCK_LNG)), 14);
+                    map.animateCamera(cameraUpdate);
+
+                    map.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
+                        @Override
+                        public void onInfoWindowClick(Marker marker) {
+                            Intent geofenceServiceIntent = new Intent(MainActivity.this, EnteringGeoFenceService.class);
+                            startService(geofenceServiceIntent);
+
+                            Intent intent = new Intent(android.content.Intent.ACTION_VIEW,
+                                    Uri.parse("google.navigation:q=" + marker.getTitle()));
+                            startActivity(intent);
+                        }
+                    });
                 } catch (SecurityException e){
                     Log.e(TAG, "SecurityException -- START -- " + e.toString());
                 }
@@ -185,6 +227,57 @@ public class MainActivity extends AppCompatActivity
         Typeface face=Typeface.createFromAsset(getAssets(),
                 "fonts/Roboto-Bold.ttf");
 
-        miyagiButton.setTypeface(face);
+        miyagiRequestButton.setTypeface(face);
+    }
+
+    private void setupListeners(){
+        miyagiFAB.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Snackbar.make(v, miyagiQuotes.get(miyagiCycleCouter), Snackbar.LENGTH_LONG)
+                        .setAction("Action", null).show();
+
+                if(miyagiCycleCouter >= miyagiQuotes.size()-1){
+                    miyagiCycleCouter = 0;
+                } else {
+                    miyagiCycleCouter++;
+                }
+                Webservice.fetchDriverUpdateLocation(MainActivity.map, markerIcon, Constants.LYFT_ACCESS_TOKEN);
+            }
+        });
+
+
+        miyagiRequestButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this, LocationActivity.class);
+                startActivityForResult(intent, REQUEST_DESTINATION);
+            }
+        });
+    }
+
+    private void setupMiyagiQuotes(){
+        miyagiQuotes.add("Man who catch fly with chopstick, accomplish anything");
+        miyagiQuotes.add("First learn stand, then learn fly. Nature rule Daniel son, not mine");
+        miyagiQuotes.add("Never put passion in front of principle, even if you win, you’ll lose");
+        miyagiQuotes.add("It’s ok to lose to opponent. It’s never okay to lose to fear");
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        Log.d(TAG, "onActivityResult -- START -- " + resultCode);
+
+        if (resultCode == RESULT_OK) {
+            switch (requestCode) {
+                case REQUEST_DESTINATION:
+                    Log.d(TAG, "onActivityResult -- START - " + data.getStringExtra("name"));
+                    Log.d(TAG, "onActivityResult -- START - " + data.getDoubleExtra("lng", 0));
+                    Log.d(TAG, "onActivityResult -- START - " + data.getDoubleExtra("lat", 0));
+
+                    Webservice.fetchEstimatedCost(Constants.MOCK_LAT, Constants.MOCK_LAT, String.valueOf(data.getDoubleExtra("lng", 0)), String.valueOf(data.getDoubleExtra("lat", 0)));
+                    break;
+                default:
+            }
+        }
     }
 }

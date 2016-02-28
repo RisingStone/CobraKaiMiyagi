@@ -8,6 +8,11 @@ var HubModel = function() {
     name: String,
     visible: Boolean,
     riders: { type: Array },
+    drivers: { type: Array },
+    hub: {
+      type: { type: String },
+      coordinates: [Number]
+    },
     area: {
     	type: { type: String },
     	coordinates: { type: Array }
