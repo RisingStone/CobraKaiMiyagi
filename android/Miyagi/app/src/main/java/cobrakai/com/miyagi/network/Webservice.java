@@ -169,12 +169,12 @@ public class Webservice {
                                 LatLng latLng = new LatLng(lat,lng);
 
                                 LatLngInterpolator latLngInterpolator = new LatLngInterpolator.Linear();
-                                Marker marker = markers.get(counter);
+                                Marker marker = markers.size() > counter ? markers.get(counter) : null;
 
                                 if(marker != null){
                                     MarkerAnimation.animateMarkerToGB(marker, latLng, latLngInterpolator, 1500);
                                 } else{
-                                    marker = map.addMarker(new MarkerOptions().position(latLng));
+                                    marker = map.addMarker(new MarkerOptions().position(latLng).icon(markerIcon).title("Driver " + counter));
 
                                     if(marker!=null){
                                         markers.add(marker);

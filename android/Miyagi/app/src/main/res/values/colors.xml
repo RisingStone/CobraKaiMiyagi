@@ -7,4 +7,6 @@
 
     <color name="miyagi_flag">#ffbbdefb</color>
     <color name="actionbar_background">@android:color/holo_blue_dark</color>
+    <color name="holo_blue_dark">#ff0099cc</color>
+
 </resources>

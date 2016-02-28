@@ -36,6 +36,7 @@ import com.google.android.gms.maps.model.Marker;
 import java.util.ArrayList;
 
 import butterknife.InjectView;
+import cobrakai.com.miyagi.service.EnteringGeoFenceService;
 import io.oauth.OAuthCallback;
 import io.oauth.OAuthData;
 import cobrakai.com.miyagi.utils.Constants;
@@ -178,7 +179,10 @@ public class MainActivity extends AppCompatActivity
                     map.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
                         @Override
                         public void onInfoWindowClick(Marker marker) {
-                            
+
+                            Intent geofenceServiceIntent = new Intent(MainActivity.this, EnteringGeoFenceService.class);
+                            startService(geofenceServiceIntent);
+
                             Intent intent = new Intent(android.content.Intent.ACTION_VIEW,
                                     Uri.parse("google.navigation:q=" + marker.getTitle()));
                             startActivity(intent);
