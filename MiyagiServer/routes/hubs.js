@@ -192,6 +192,44 @@ router.post('/:hub_id/drivers/:driver', function(req, res, next) {
 });
 
 //
+// FATAL: Just for Mark's web app: Add driver to existing hub's queue
+//
+router.get('/:hub_id/drivers/:driver', function(req, res, next) {
+	var hub_id = req.params.hub_id;
+	var driver = req.params.driver;
+	console.log('Adding driver ' + driver + ' to hub_id ' + hub_id);
+	
+	Hub.findOne({ "_id": hub_id }, function (err, hub){
+	  if (err || !hub) {
+	  	console.error('Where is my hub? ', err);
+	  	return res.json(404, "No hub");
+	  }
+
+	  if(driver) {
+	  	var i = 0;
+	  	// Ensure only unique drivers in queue
+	  	for(; i < hub.drivers.length; i++) {
+	  		if(hub.drivers[i] === driver) {
+	  			console.log('Re-queuing driver ' + driver);
+	  			hub.drivers.splice(i, 1); // In-place removal
+	  			break;
+	  		}
+	  	}
+	  	// Enqueue given driver
+	  	hub.drivers.push(driver);
+	  	hub.save(function(err) {
+			if(err)
+				res.send(500, err);
+			else
+				res.send(200);
+	  	});
+	  } else {
+	  	return res.send(400, "No driver");
+	  }
+	});
+});
+
+//
 // Dequeue rider & driver pair from FIFO queue on existing hub
 //
 router.delete('/:hub_id/top', function(req, res, next) {
