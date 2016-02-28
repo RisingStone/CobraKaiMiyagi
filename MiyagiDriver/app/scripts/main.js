@@ -12,10 +12,8 @@ var serverIP = "http://192.168.11.133:3000";
 
 var createdDriver = false;
 
-var driverId;
-
 var driver = {
-	name: "Driver",
+	name: "mark",
 	location: {
 		"type": "Point",
 		"coordinates": [
@@ -101,7 +99,9 @@ function createDriver() {
 	//See if we made a driver yet, if not, make one
 	if(!createdDriver){
 		driver.name = makeName();
-		registerDriver(driver);
+		$('#drivername').text(driver.name);	
+		createdDriver = true;
+		// registerDriver(driver);
 	}else{
 		console.log(driver.name + " already created!");
 	}
@@ -116,17 +116,10 @@ function registerDriver(driver){
 	$.ajax({
 
 		// The URL for the request
-		url: serverIP + "/drivers",
-		
-		headers: {
-			'Content-Type':'application/json'
-		},
-	
-		// The data to send 
-		data : driver,
+		url: serverIP + "/drivers/" + driver.name,
 	
 		// Whether this is a POST or GET request
-		type: "POST",
+		type: "GET",
 	
 		// The type of data we expect back
 		dataType : "json",
@@ -136,9 +129,7 @@ function registerDriver(driver){
 		success: function( json ) {
 			createdDriver = true;
 			
-			driverId = json[0];
-			
-			console.log('DriverID: ' + driverId);
+			console.log('Drivename: ' + driver.name);
 		},
 	
 		// Code to run if the request fails; the raw request and
@@ -229,6 +220,72 @@ function queryHubList(){
 	});
 }
 
+function queueDriver(){
+	console.log("queueDriver:");
+	
+	// Using the core $.ajax() method
+	$.ajax({
+
+		// The URL for the request
+		url: serverIP + "/hubs/" + hubList[0]._id + '/drivers/' + driver.name,
+	
+		// Whether this is a POST or GET request
+		type: "GET",
+	
+		// The type of data we expect back
+		dataType : "json",
+	
+		// Code to run if the request succeeds;
+		// the response is passed to the function
+		success: function( json ) {
+			console.log(json);
+		},
+	
+		// Code to run if the request fails; the raw request and
+		// status codes are passed to the function
+		error: function( xhr, status, errorThrown ) {
+			console.error("Sorry, there was a problem!");
+		},
+	
+		// Code to run regardless of success or failure
+		complete: function( xhr, status ) {
+		}
+	});
+}
+
+function dequeueDriver(){
+	console.log("dequeueDriver:");
+	
+	// Using the core $.ajax() method
+	$.ajax({
+
+		// The URL for the request
+		url: serverIP + "/hubs/" + hub._id + '/top',
+	
+		// Whether this is a POST or GET request
+		type: "GET",
+	
+		// The type of data we expect back
+		dataType : "json",
+		
+		// Code to run if the request succeeds;
+		// the response is passed to the function
+		success: function( json ) {
+			console.log(json);
+		},
+	
+		// Code to run if the request fails; the raw request and
+		// status codes are passed to the function
+		error: function( xhr, status, errorThrown ) {
+			console.error("Sorry, there was a problem!");
+		},
+	
+		// Code to run regardless of success or failure
+		complete: function( xhr, status ) {
+		}
+	});
+}
+
 function updateHubs(json){
 	console.log(json);
 	
@@ -292,6 +349,7 @@ function acceptRide(){
 	$('.close').alert('close');
 	
 	//dequeue rider and driver
+	dequeueDriver();
 
 	console.log('Ride accepted!');	
 }
@@ -302,25 +360,35 @@ function updateQueue(json){
 	
 	hub = json;
 	
+	for(var j = 0; j < iconIds.length; j++){
+		$('#r'+iconIds[j]).text('');
+		$('#d'+iconIds[j]).text('');	
+	}
+	
 	for(var i = 0; i < hub.riders.length; i++){
 		var hubRiderPostion = hub.riders[i];
-		$('#r'+iconIds[i]).text(hubDriverPositon.name);
+		$('#r'+iconIds[i]).text(hubRiderPostion);
 	}
 			
 	for(var i = 0; i < hub.drivers.length; i++){
 		var hubDriverPositon = hub.drivers[i];
-		$('#d'+iconIds[i]).text(hubRiderPostion.name);	
+		if(hubDriverPositon == driver.name){
+			$('#d'+iconIds[i]).text('(YOU)');
+		}	
+		else{			
+			$('#d'+iconIds[i]).text(hubDriverPositon);	
+		}
 	}
 	
 	//Check hub driver position 1, if it's our ID, then let's put up an accept thing
-	if(hub.riders == driver.name){
+	if(hub.drivers[0] == driver.name && hub.riders.length < 0){
 		createAlertRideAccept();
 	}
 }
 
 $('#location').on('click', function () {
 	console.log('Location btn pressed');
-	
+	createDriver();
 	getDriverLocation();
 });
 
@@ -332,6 +400,8 @@ $('#register').on('click', function () {
 
 $('#enter').on('click', function () {
 	console.log('Location btn pressed');
+	
+	queueDriver();
 });
 
 $('#leave').on('click', function () {
