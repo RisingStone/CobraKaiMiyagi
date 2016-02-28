@@ -21,11 +21,15 @@ import android.widget.Button;
 import butterknife.ButterKnife;
 import cobrakai.com.miyagi.network.Auth;
 import cobrakai.com.miyagi.network.Webservice;
+
+import com.google.android.gms.maps.CameraUpdate;
+import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.LatLng;
 
 import butterknife.InjectView;
 import cobrakai.com.miyagi.utils.Constants;
@@ -55,8 +59,6 @@ public class MainActivity extends AppCompatActivity
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.setDrawerListener(toggle);
         toggle.syncState();
-
-
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
@@ -141,6 +143,9 @@ public class MainActivity extends AppCompatActivity
                     map.setMapType(GoogleMap.MAP_TYPE_NORMAL);
 
                     Webservice.fetchDriverLocation(map, markerIcon, Constants.LYFT_ACCESS_TOKEN_SANDBOX);
+                    CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(
+                            new LatLng(Double.valueOf(Constants.MOCK_LAT), Double.valueOf(Constants.MOCK_LNG)), 14);
+                    map.animateCamera(cameraUpdate);
                 } catch (SecurityException e){
                     Log.e(TAG, "SecurityException -- START -- " + e.toString());
                 }
