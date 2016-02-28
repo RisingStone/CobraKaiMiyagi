@@ -7,10 +7,7 @@ var driver = {
 	v: 0,
 	location: {
 		type: "Point",
-		coordinates: [
-			0,
-			0
-		]
+		coordinates: [37.807798, -122.431253]
 	}
 }
 
@@ -42,14 +39,17 @@ function makeid() {
 
 function getLocation() {
     if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(showPosition, showError);
+        navigator.geolocation.getCurrentPosition(updatePostion, showError);
     } else { 
 		$("#output").append("Geolocation is not supported by this browser.");
     }
 }
 
-function showPosition(position) {
+function updatePostion(position) {
+	//Do driver related reg
 	driver.location.coordinates = [position.coords.latitude,position.coords.longitude]; 
+	
+	//UpdateMap
 	updateMap(driver.location);
 	
 	$("#output").append("Latitude: " + position.coords.latitude + 
@@ -79,43 +79,81 @@ function updateMap(location){
 	map.panTo(myLatlng);
 }
 
+function createDriver(){
+	driver.id = makeid();
+	driver.name = makeName();
+}
+
+function registerDriver(){
+	// Using the core $.ajax() method
+	$.ajax({
+
+		// The URL for the request
+		url: "http://192.168.11.132:3000/drivers",
+	
+		// The data to send (will be converted to a query string)
+		body: {
+			driver
+		},
+	
+		// Whether this is a POST or GET request
+		type: "POST",
+	
+		// The type of data we expect back
+		dataType : "json",
+	
+		// Code to run if the request succeeds;
+		// the response is passed to the function
+		success: function( json ) {
+			$("#output").append(json);
+		},
+	
+		// Code to run if the request fails; the raw request and
+		// status codes are passed to the function
+		error: function( xhr, status, errorThrown ) {
+			$("#output").append("Sorry, there was a problem!" );
+		},
+	
+		// Code to run regardless of success or failure
+		complete: function( xhr, status ) {
+		}
+	});
+}
+
+function queryHub(){
+	// Using the core $.ajax() method
+	$.ajax({
+
+		// The URL for the request
+		url: "http://192.168.11.132:3000/drivers",
+	
+		// Whether this is a POST or GET request
+		type: "GET",
+	
+		// The type of data we expect back
+		dataType : "json",
+	
+		// Code to run if the request succeeds;
+		// the response is passed to the function
+		success: function( json ) {
+			$("#output").append(json);
+		},
+	
+		// Code to run if the request fails; the raw request and
+		// status codes are passed to the function
+		error: function( xhr, status, errorThrown ) {
+			$("#output").append("Sorry, there was a problem!" );
+		},
+	
+		// Code to run regardless of success or failure
+		complete: function( xhr, status ) {
+		}
+	});
+}
+
 getLocation();
-driver.id = makeid();
-driver.name = makeName();
+createDriver();
+registerDriver();
 
-$("#output").append("<br>Driver: <br> Name:" + driver.name + "<br>ID: " + driver._id + "<br>Location: <br>" + driver.location.coordinates + "<br> Type: " + driver.location.type);
+$("#output").append("<br>Driver: <br> Name:" + driver.name + "<br>ID: " + driver.id + "<br>Location: <br>" + driver.location.coordinates + "<br> Type: " + driver.location.type);
 
-// Using the core $.ajax() method
-$.ajax({
-
-    // The URL for the request
-    url: "10.0.12.224:3000/drivers",
- 
-    // The data to send (will be converted to a query string)
-    data: {
-        "driverId": driverid,
-		"location" : location 
-    },
- 
-    // Whether this is a POST or GET request
-    type: "POST",
- 
-    // The type of data we expect back
-    dataType : "json",
- 
-    // Code to run if the request succeeds;
-    // the response is passed to the function
-    success: function( json ) {
-        $("#output").append(json);
-    },
- 
-    // Code to run if the request fails; the raw request and
-    // status codes are passed to the function
-    error: function( xhr, status, errorThrown ) {
-        $("#output").append("Sorry, there was a problem!" );
-    },
- 
-    // Code to run regardless of success or failure
-    complete: function( xhr, status ) {
-    }
-});
