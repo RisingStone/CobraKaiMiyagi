@@ -19,16 +19,17 @@
 	<div id = "alert_placeholder"></div>
 	
 	<div class="btn-group-vertical" role="group" aria-label="Script Actions">
+		<div id='drivername'></div>
+		<button type="button" class="btn btn-default" id="location">Create Driver</button>
 		<button type="button" class="btn btn-default" id="hubs">Get Hubs</button>
 		<button type="button" class="btn btn-default" id="hub">Start Hub Loop</button>
 		<button type="button" class="btn btn-default" id="stop">stop Hub Loop</button>
-		<button type="button" class="btn btn-default" id="location">Find Location</button>
-		<button type="button" class="btn btn-default" id="register">Register Driver</button>
 		<button type="button" class="btn btn-default" id="enter">Enter queue</button>
 		<button type="button" class="btn btn-default" id="leave">Leave queue</button>
 	</div>
 	
 	<div id="driverQueue">
+		Drivers
 		<div class="container queuePosition" id="dfirst"></div>
 		<div class="container queuePosition" id="dsecond"></div>
 		<div class="container queuePosition" id="dthird"></div>
@@ -42,6 +43,7 @@
 	</div>
 	
 	<div id="riderQueue">
+		Riders
 		<div class="container queuePosition" id="rfirst"></div>
 		<div class="container queuePosition" id="rsecond"></div>
 		<div class="container queuePosition" id="rthird"></div>

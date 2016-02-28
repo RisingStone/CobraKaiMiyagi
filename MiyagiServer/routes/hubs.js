@@ -145,7 +145,7 @@ router.post('/:hub_id/riders/:rider', function(req, res, next) {
 			if(err)
 				res.send(500, err);
 			else
-				res.send(200);
+				res.json(200, {});
 	  	});
 	  } else {
 	  	return res.send(400, "No rider");
@@ -183,7 +183,7 @@ router.post('/:hub_id/drivers/:driver', function(req, res, next) {
 			if(err)
 				res.send(500, err);
 			else
-				res.send(200);
+				res.json(200, {});
 	  	});
 	  } else {
 	  	return res.send(400, "No driver");
@@ -221,7 +221,7 @@ router.get('/:hub_id/drivers/:driver', function(req, res, next) {
 			if(err)
 				res.send(500, err);
 			else
-				res.send(200);
+				res.json(200, {});
 	  	});
 	  } else {
 	  	return res.send(400, "No driver");
@@ -320,7 +320,7 @@ router.delete('/:hub_id/riders/:rider', function(req, res, next) {
 					if(err)
 						res.send(500, err);
 					else
-						res.send(200);
+						res.json(200, {});
 			  	});
 	  			break;
 	  		}
