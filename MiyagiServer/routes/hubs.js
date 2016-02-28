@@ -68,7 +68,7 @@ router.put('/:hub_id', function(req, res, next) {
 	console.log('Updating hub ' + hub_id);
 
 	Hub.findOne({ _id: hub_id }, function (err, hub){
-	  if (err) {
+	  if (err || !hub) {
 	  	console.error('Where is my hub? ', err);
 	  	return res.json(404, err);
 	  }
@@ -100,7 +100,7 @@ router.post('/:hub_id/riders/:rider', function(req, res, next) {
 	var rider = req.params.rider;
 	console.log('Adding rider ' + rider + ' to hub_id ' + hub_id);
 	
-	Hub.findOne({ _id: hub_id }, function (err, hub){
+	Hub.findOne({ "_id": hub_id }, function (err, hub){
 	  if (err) {
 	  	console.error('Where is my hub? ', err);
 	  	return res.json(404, err);
@@ -138,12 +138,13 @@ router.delete('/:hub_id/top', function(req, res, next) {
 	var hub_id = req.params.hub_id;
 	console.log('Removing top rider from hub_id ' + hub_id);
 	
-	Hub.findOne({ _id: hub_id }, function (err, hub){
+	Hub.findOne({ "_id": hub_id }, function (err, hub){
 	  if (err) {
 	  	console.error('Where is my hub? ', err);
 	  	return res.json(404, err);
 	  }
 
+	  console.log("My hub: ", hub);
 	  if(hub.riders.length == 0) {
 	  	return res.send(404, "No rider in queue");
 	  }
@@ -154,7 +155,7 @@ router.delete('/:hub_id/top', function(req, res, next) {
 		if(err)
 			res.send(500, err);
 		else
-			res.send(200);
+			res.send(200, '[' + rider + ']');
   	  });
 	});
 });
@@ -167,7 +168,7 @@ router.delete('/:hub_id/riders/:rider', function(req, res, next) {
 	var rider = req.params.rider;
 	console.log('Removing rider ' + rider + ' from hub_id ' + hub_id);
 	
-	Hub.findOne({ _id: hub_id }, function (err, hub){
+	Hub.findOne({ "_id": hub_id }, function (err, hub){
 	  if (err) {
 	  	console.error('Where is my hub? ', err);
 	  	return res.json(404, err);
