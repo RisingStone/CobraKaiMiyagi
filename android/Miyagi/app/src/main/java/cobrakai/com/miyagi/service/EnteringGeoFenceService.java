@@ -29,6 +29,7 @@ import java.util.Calendar;
 import java.util.HashSet;
 import java.util.Set;
 
+import cobrakai.com.miyagi.network.Webservice;
 import cobrakai.com.miyagi.views.ColorStrobeActivity;
 import pl.charmas.android.reactivelocation.ReactiveLocationProvider;
 import rx.Observable;
@@ -51,7 +52,7 @@ public class EnteringGeoFenceService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.d(TAG, "onStartCommand -- START");
 
-        String hubId = intent.getStringExtra("hubId");
+        final String hubId = intent.getStringExtra("hubId");
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
@@ -61,7 +62,7 @@ public class EnteringGeoFenceService extends Service {
 //                startActivity(intent);
 
                 //Enter que after 10 seconds
-                
+                Webservice.queRider(hubId, "Gary");
                 stopSelf();
             }
         }, 10000);

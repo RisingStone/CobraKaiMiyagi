@@ -594,7 +594,7 @@ public class Webservice {
 
         Webservice.Post webservice = retrofit.create(Webservice.Post.class);
 
-        Observable<String> reverseObservable = webservice.queRider("application/json", hubid, "rider", id);
+        Observable<String> reverseObservable = webservice.queRider("application/json", hubid, "riders", id);
         reverseObservable
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
