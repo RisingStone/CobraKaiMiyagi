@@ -1,10 +1,11 @@
 var map;
 var driverid;
 
+var createdDriver = false;
+
 var driver = {
-	id: "",
 	name: "",
-	v: 0,
+	visible: true,
 	location: {
 		type: "Point",
 		coordinates: [37.807798, -122.431253]
@@ -12,22 +13,18 @@ var driver = {
 }
 
 function initMap() {
-		var myLatlng = new google.maps.LatLng(driver.location.coordinates[0], driver.location.coordinates[1]);
-		
-		var mapOptions = {
-			zoom: 18,
-			center: myLatlng,
-			mapTypeId: google.maps.MapTypeId.ROADMAP
-		};
-		
-        map = new google.maps.Map(document.getElementById('map'), mapOptions);
-      }
+	var myLatlng = new google.maps.LatLng(driver.location.coordinates[0], driver.location.coordinates[1]);
 	
-function makeName(){
-	return "Mark Stanford";
+	var mapOptions = {
+		zoom: 18,
+		center: myLatlng,
+		mapTypeId: google.maps.MapTypeId.ROADMAP
+	};
+	
+	map = new google.maps.Map(document.getElementById('map'), mapOptions);
 }
 
-function makeid() {
+function makeName() {
     var text = "";
     var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
 
@@ -37,27 +34,33 @@ function makeid() {
     return text;
 }
 
-function getLocation() {
+function getDriverLocation() {
     if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(updatePostion, showError);
     } else { 
-		$("#output").append("Geolocation is not supported by this browser.");
+		console.log("Location not supported!!!")
     }
 }
 
 function updatePostion(position) {
+	console.log(position.coords);
+	
 	//Do driver related reg
 	driver.location.coordinates = [position.coords.latitude,position.coords.longitude]; 
 	
 	//UpdateMap
 	updateMap(driver.location);
 	
-	$("#output").append("Latitude: " + position.coords.latitude + 
-    "<br>Longitude: " + position.coords.longitude);	
+	//See if we made a driver yet, if not, make one
+	if(!createdDriver){
+		createDriver();
+		registerDriver(driver);
+	}else{
+	}
 }
 
 function showError(error) {
-	$("#output").append(error.code);
+	console.error("Location Error: " + error.code);
     switch(error.code) {
         case error.PERMISSION_DENIED:
             
@@ -80,21 +83,23 @@ function updateMap(location){
 }
 
 function createDriver(){
-	driver.id = makeid();
 	driver.name = makeName();
+	
+	//Debug
+	console.log(driver);
 }
 
-function registerDriver(){
+function registerDriver(driver){
+	console.log(driver);
+		
 	// Using the core $.ajax() method
 	$.ajax({
 
 		// The URL for the request
 		url: "http://192.168.11.132:3000/drivers",
 	
-		// The data to send (will be converted to a query string)
-		body: {
-			driver
-		},
+		// The data to send 
+		data : driver,
 	
 		// Whether this is a POST or GET request
 		type: "POST",
@@ -121,6 +126,7 @@ function registerDriver(){
 }
 
 function queryHub(){
+		
 	// Using the core $.ajax() method
 	$.ajax({
 
@@ -151,9 +157,30 @@ function queryHub(){
 	});
 }
 
-getLocation();
-createDriver();
-registerDriver();
+function createAlertRideAccept(){
+		var alertMarkup = '\
+		<div class="alert alert-danger alert-dismissible fade in" role="alert">\
+			<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">×</span></button>\
+			<h4>Accept Ride?</h4>\
+			<p>Top of queue reached.</p>\
+			<p><button type="button" class="btn btn-danger">Accept Ride</button> <button type="button" class="btn btn-default">Leave Queue</button></p>\
+		</div>\
+		';
+	
+		var bootstrap_alert = function() {}
+		bootstrap_alert.warning = function(message) {
+            $('#alert_placeholder').html(alertMarkup);
+        }
+		bootstrap_alert.warning("Here is my Alert!");
+		
+		$('#alert_placeholder').on('btn.btn-default', function () {
+			console.log("Alert button pressed!");
+		})
+		
+		$('#alert_placeholder').on('btn.btn-danger', function () {
+			console.log("Alert button pressed!");
+		})
+}
 
-$("#output").append("<br>Driver: <br> Name:" + driver.name + "<br>ID: " + driver.id + "<br>Location: <br>" + driver.location.coordinates + "<br> Type: " + driver.location.type);
-
+getDriverLocation();
+createAlertRideAccept();
