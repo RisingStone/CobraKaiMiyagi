@@ -14,7 +14,7 @@ var DriverModel = function() {
     	coordinates: [Number]
     }
   });
-
+  DriverSchema.index({ location: '2dsphere' });
   // register the mongoose model
   mongoose.model('Driver', DriverSchema);
 };

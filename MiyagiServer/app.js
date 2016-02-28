@@ -15,6 +15,7 @@ var fs = require('fs');
 var path = require('path');
 var routes = require('./routes/index');
 var drivers = require('./routes/drivers');
+var hubs = require('./routes/hubs');
 
 // Bootstrap mongoose and load dummy data
 mongoose.connect('mongodb://localhost/miyagi_db', function(err) {
@@ -63,6 +64,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', routes);
 app.use('/drivers', drivers);
+app.use('/hubs', hubs);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

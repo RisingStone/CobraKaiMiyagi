@@ -1,16 +1,16 @@
 var express = require('express');
 var router = express.Router();
 var mongoose = require('mongoose');
-var Driver = mongoose.model('Driver');
+var Hub = mongoose.model('Hub');
 
-/* GET all drivers listing. */
+/* GET all hubs, or only hubs within given distance of a lat/long pair */
 router.get('/', function(req, res, next) {
 	var limit = req.query.limit || 100;
 
 	if(!req.query || !req.query.longitude || !req.query.latitude) {
-		Driver.find({}).limit(limit).exec(function(err, drivers) {
+		Hub.find({}).limit(limit).exec(function(err, hubs) {
 		    if (!err) { 
-		        res.json(200, drivers);
+		        res.json(200, hubs);
 		    } else {
 		    	throw err;
 		    }
@@ -26,28 +26,20 @@ router.get('/', function(req, res, next) {
 	    pair[0] = req.query.longitude;
 	    pair[1] = req.query.latitude;
 
-	    // get nearby drivers
-	    var query = Driver.find({})
-	    	.where('location')
+	    // get nearby hubs
+	    var query = Hub.find({})
+	    	.where('area')
 	    	.near({
 	    		center: { type: 'Point', coordinates: pair },
 	    		maxDistance: radius * 1609.34,
 	    		spherical: true
 	    	})
 	    	.limit(limit)
-	    	.exec(function(err, drivers) {
+	    	.exec(function(err, hubs) {
 	      		if (err) return res.json(500, err);
-	      		res.json(200, drivers);
+	      		res.json(200, hubs);
 	    	});
 	}
-});
-
-router.post('/', function(req, res, next) {
-	var newDriver = new Driver(req.body);
-	newDriver.save(function(err) {
-		if(err) res.send(500, err);
-		else res.json(req.body);
-	});
 });
 
 module.exports = router;
