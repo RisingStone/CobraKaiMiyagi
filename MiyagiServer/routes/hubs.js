@@ -45,6 +45,28 @@ router.get('/', function(req, res, next) {
 });
 
 //
+// GET all hubs, or only hubs within given distance of a lat/long pair
+//
+router.get('/:hub_id', function(req, res, next) {
+	var hub_id = req.params.hub_id;
+	if(hub_id) {
+		Hub.findOne({ "_id": hub_id }, function (err, hub) {
+			if (err) {
+				console.error('Where is my hub? ', err);
+			  	return res.json(404, err);
+			}
+			if(hub) {
+				res.json(200, hub);
+			} else {
+				res.send(404, "No hub found");
+			}
+		});
+	} else {
+		res.send(400, "Missing hub id");
+	}
+});
+
+//
 // Create new hub
 // 
 router.post('/', function(req, res, next) {

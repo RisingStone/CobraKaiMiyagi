@@ -1,4 +1,3 @@
 #!/bin/bash
 
-
-curl -H "Authorization: Token z6fHo-hQHErRwa4cKZM1Ca-tBsEWZH0SsZvoOkP2" "https://api.uber.com/v1/estimates/price?start_latitude=$2&start_longitude=$1&end_latitude=37.8080891&end_longitude=-122.4311959" | python -mjson.tool | head -n 15 | grep surge | cut -d ':' -f 2
+curl -s -H "Authorization: Token z6fHo-hQHErRwa4cKZM1Ca-tBsEWZH0SsZvoOkP2" "https://api.uber.com/v1/estimates/price?start_latitude=$2&start_longitude=$1&end_latitude=37.8080891&end_longitude=-122.4311959" | python -mjson.tool | head -n 15 | grep surge | cut -d ':' -f 2

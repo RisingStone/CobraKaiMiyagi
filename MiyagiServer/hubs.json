@@ -1,50 +1,16 @@
 [
   {
-    "name": "Club Hub",
-    "visible": true,
-    "riders":[],
-    "drivers":[],
-    "area": {
-        "type": "Polygon",
-        "coordinates": [
-          [
-            [
-              -122.41982817649841,
-              37.76829766998914
-            ],
-            [
-              -122.41991400718689,
-              37.76895071032235
-            ],
-            [
-              -122.42007493972778,
-              37.76895071032235
-            ],
-            [
-              -122.4201500415802,
-              37.76943412607515
-            ],
-            [
-              -122.42028951644897,
-              37.76942564512426
-            ],
-            [
-              -122.42012858390808,
-              37.76827222674256
-            ],
-            [
-              -122.41982817649841,
-              37.76829766998914
-            ]
-          ]
-        ]
-      }
-  },
-  {
       "name": "Ferry Building Hub",
       "visible": true,
       "riders":[],
       "drivers":[],
+      "hub":{
+        "type": "Point",
+        "coordinates": [
+          -122.39383757114409,
+          37.79529014176874
+        ]
+      },
       "area": {
         "type": "Polygon",
         "coordinates": [
@@ -77,7 +43,14 @@
 	"name": "4th and King Caltrain Station Hub",
 	"visible": true,
 	"riders":[],
-  "drivers":[],
+	"drivers":[],
+      "hub":{
+        "type": "Point",
+        "coordinates": [
+          -122.39515721797942,
+          37.77686730545835
+        ]
+      },
 	"area":{
           "type": "Polygon",
           "coordinates": [
@@ -119,6 +92,13 @@
         "visible": true,
         "riders":[],
         "drivers":[],
+      "hub":{
+        "type": "Point",
+        "coordinates": [
+          -122.41989791393279,
+          37.76833159430431
+        ]
+      },
         "area":{
           "type": "Polygon",
           "coordinates": [
@@ -152,6 +132,13 @@
         "visible": true,
         "riders":["Atha", "Addie"],
         "drivers":[],
+      "hub":{
+        "type": "Point",
+        "coordinates": [
+          -122.42367714643477,
+          37.741679250056194
+        ]
+      },
         "area":{
           "type": "Polygon",
           "coordinates": [
@@ -185,6 +172,13 @@
       "visible": true,
       "riders":[],
       "drivers":[],
+      "hub":{
+        "type": "Point",
+        "coordinates": [
+          -122.40811228752136,
+          37.787483625506624
+        ]
+      },
       "area":{
         "type": "Polygon",
         "coordinates": [
@@ -218,6 +212,13 @@
       "visible": true,
       "riders":[],
       "drivers":[],
+      "hub":{
+        "type": "Point",
+        "coordinates": [
+          -122.40478634834288,
+          37.806278911269914
+        ]
+      },
       "area":{
         "type": "Polygon",
         "coordinates": [
@@ -255,10 +256,17 @@
       }
     },
     {
-      "name": "Alcatraz Cruises Hub",
+      "name": "Fishermans Wharf Hub",
       "visible": true,
       "riders":[],
       "drivers":[],
+      "hub":{
+        "type": "Point",
+        "coordinates": [
+          -122.41003811359406,
+          37.80839806159194
+        ]
+      },
       "area":{
         "type": "Polygon",
         "coordinates": [
@@ -282,6 +290,54 @@
             [
               -122.41090714931487,
               37.808580305679776
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "name": "Fort Mason Hub",
+      "visible": true,
+      "riders":[],
+      "drivers":[],
+      "hub":{
+        "type": "Point",
+        "coordinates": [
+          -122.43213415145874,
+          37.80536765793452
+        ]
+      },
+      "area":{
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -122.43204832077026,
+              37.804333477737124
+            ],
+            [
+              -122.43171572685242,
+              37.80438433939691
+            ],
+            [
+              -122.43196249008179,
+              37.80557957831826
+            ],
+            [
+              -122.43368983268738,
+              37.80526593593434
+            ],
+            [
+              -122.43361473083496,
+              37.80488447718573
+            ],
+            [
+              -122.43228435516357,
+              37.80506249151361
+            ],
+            [
+              -122.43204832077026,
+              37.804333477737124
             ]
           ]
         ]
