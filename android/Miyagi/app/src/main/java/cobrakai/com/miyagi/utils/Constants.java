@@ -21,6 +21,7 @@ public class Constants {
     //Miyagi API
     public static final String LOCAL_HOST_PREFIX = "http://192.168.11.133:3000/";
     public static final String MIYAGI_API_HUBS = "hubs/";
+    public static final String MIYAGI_API_HUBS_QUE_PERSON = "hubs/{hubid}/{ridertype}/{id}";
     public static final String TESTPREFIX = "http://192.168.11.129:8080/";
     public static final String TESTSUFFX = "api/miyagi/hubs?";
 

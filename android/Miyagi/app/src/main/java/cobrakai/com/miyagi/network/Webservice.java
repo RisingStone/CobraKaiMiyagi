@@ -63,6 +63,7 @@ import java.io.InputStream;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -281,7 +282,7 @@ public class Webservice {
                                 Log.d(TAG, "lat: " + lat);
                                 Log.d(TAG, "lng: " + lng);
 
-                                reverseGeoLoookup(map, markerIcon, lat, lng);
+//                                reverseGeoLoookup(map, markerIcon, lat, lng);
                             }
                         }
                     }
@@ -384,7 +385,7 @@ public class Webservice {
                 });
     }
 
-    public static void fetchKreeseLocation(final GoogleMap map, final BitmapDescriptor kreeseIcon, Context context) {
+    public static void fetchKreeseLocation(final GoogleMap map, final BitmapDescriptor kreeseIcon, Context context, final HashMap hm) {
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(Constants.LOCAL_HOST_PREFIX)
                 .addConverterFactory(GsonConverterFactory.create())
@@ -415,7 +416,7 @@ public class Webservice {
                                        double lat = hub.getHubPoint().getCoordinates().get(1);
                                        double lng = hub.getHubPoint().getCoordinates().get(0);
 
-                                       reverseGeoLoookup(map, kreeseIcon, lat, lng);
+                                       reverseGeoLoookup(map, kreeseIcon, lat, lng, hm, hub.getId());
 
                                        ArrayList<LatLng> latLngs = new ArrayList<>();
                                        List<List<Double>> coordinates = hub.getArea().getCoordinates().get(0);
@@ -503,7 +504,7 @@ public class Webservice {
                 });
     }
 
-    public static void reverseGeoLoookup(final GoogleMap map, final BitmapDescriptor markerIcon, final double lat, final double lng) {
+    public static void reverseGeoLoookup(final GoogleMap map, final BitmapDescriptor markerIcon, final double lat, final double lng, final HashMap hm, final String hubid) {
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(Constants.GOOGLE_MAPS_BASEURL)
                 .addConverterFactory(GsonConverterFactory.create())
@@ -547,6 +548,8 @@ public class Webservice {
 
                             LatLng latLng = new LatLng(lat,lng);
                             Marker marker = map.addMarker(new MarkerOptions().position(latLng).icon(markerIcon).title(address));
+
+                            hm.put(marker, hubid);
                         }
                     }
                 });
@@ -582,6 +585,37 @@ public class Webservice {
                 });
     }
 
+    public static void queRider(String hubid, String id){
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(Constants.LOCAL_HOST_PREFIX)
+                .addConverterFactory(GsonConverterFactory.create())
+                .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
+                .build();
+
+        Webservice.Post webservice = retrofit.create(Webservice.Post.class);
+
+        Observable<String> reverseObservable = webservice.queRider("application/json", hubid, "riders", id);
+        reverseObservable
+                .subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Subscriber<String>() {
+                    @Override
+                    public void onCompleted() {
+                        Log.d(TAG, "onCompleted -- onError");
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        Log.d(TAG, "queRider -- onError");
+                    }
+
+                    @Override
+                    public void onNext(String s) {
+                        Log.d(TAG, "queRider -- onNext");
+                    }
+                });
+    }
+
 
     public interface Post {
         @FormUrlEncoded
@@ -590,6 +624,14 @@ public class Webservice {
                 @Query("scope") String scope,
                 @Field("client_id") String clientId,
                 @Field("client_secret") String clientSecret
+        );
+
+        @retrofit2.http.POST(Constants.MIYAGI_API_HUBS_QUE_PERSON)
+        Observable<String> queRider(
+                @Header("Content-Type") String contentType,
+                @Path("hubid") String hubId,
+                @Path("ridertype") String riderType,
+                @Path("id") String id
         );
     }
 
