@@ -45,7 +45,13 @@ public class EnteringGeoFenceService extends Service {
     public void onCreate() {
         Log.d(TAG, "onCreate -- START");
         super.onCreate();
+    }
 
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        Log.d(TAG, "onStartCommand -- START");
+
+        String hubId = intent.getStringExtra("hubId");
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
@@ -54,17 +60,11 @@ public class EnteringGeoFenceService extends Service {
 //                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_ACTIVITY_SINGLE_TOP);
 //                startActivity(intent);
 
-                //Enter geofence after 15 seconds
-
+                //Enter que after 10 seconds
+                
                 stopSelf();
             }
-        }, 15000);
-    }
-
-    @Override
-    public int onStartCommand(Intent intent, int flags, int startId) {
-        Log.d(TAG, "onStartCommand -- START");
-
+        }, 10000);
 
         return super.onStartCommand(intent, flags, startId);
     }

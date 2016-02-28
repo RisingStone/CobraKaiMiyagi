@@ -34,6 +34,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import butterknife.InjectView;
 import cobrakai.com.miyagi.service.EnteringGeoFenceService;
@@ -60,6 +61,8 @@ public class MainActivity extends AppCompatActivity
     private static BitmapDescriptor hubIcon;
     private static GoogleMap map;
 
+    private static HashMap<Marker, String> markerHm;
+
     private int miyagiCycleCouter = 0;
 
     @Override
@@ -79,6 +82,8 @@ public class MainActivity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+
+        markerHm = new HashMap<>();
 
         miyagiQuotes = new ArrayList<>();
         setupMiyagiQuotes();
@@ -172,7 +177,7 @@ public class MainActivity extends AppCompatActivity
 
 //                    Webservice.fetchDriverInitialLocation(map, hubIcon, Constants.LYFT_ACCESS_TOKEN);
 //                    Webservice.fetchMockHubLocation(map, hubIcon, Constants.LYFT_ACCESS_TOKEN);
-                    Webservice.fetchKreeseLocation(map, hubIcon, MainActivity.this);
+                    Webservice.fetchKreeseLocation(map, hubIcon, MainActivity.this, markerHm);
                     Webservice.testMyLocalHost();
 
                     CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(
@@ -183,6 +188,8 @@ public class MainActivity extends AppCompatActivity
                         @Override
                         public void onInfoWindowClick(Marker marker) {
                             Intent geofenceServiceIntent = new Intent(MainActivity.this, EnteringGeoFenceService.class);
+                            Log.d(TAG, "hubId: " + markerHm.get(marker));
+                            geofenceServiceIntent.putExtra("hubId", markerHm.get(marker));
                             startService(geofenceServiceIntent);
 
                             Intent intent = new Intent(android.content.Intent.ACTION_VIEW,
@@ -215,6 +222,8 @@ public class MainActivity extends AppCompatActivity
     public void onDestroy() {
         super.onDestroy();
         miyagiMap.onDestroy();
+        Intent geofenceServiceIntent = new Intent(MainActivity.this, EnteringGeoFenceService.class);
+        stopService(geofenceServiceIntent);
     }
 
     @Override
