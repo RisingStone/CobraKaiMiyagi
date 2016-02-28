@@ -15,8 +15,11 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import cobrakai.com.miyagi.R;
 import cobrakai.com.miyagi.animation.LatLngInterpolator;
 import cobrakai.com.miyagi.animation.MarkerAnimation;
+import cobrakai.com.miyagi.models.foursquare.ResponseHolder;
+import cobrakai.com.miyagi.models.foursquare.Venue;
 import cobrakai.com.miyagi.models.google.AddressComponent;
 import cobrakai.com.miyagi.models.google.ReverseGeoLookupResponse;
+import cobrakai.com.miyagi.models.lyft.CostEstimates;
 import cobrakai.com.miyagi.models.lyft.Drivers;
 import cobrakai.com.miyagi.models.lyft.EstimatedTime;
 import cobrakai.com.miyagi.models.lyft.EstimatedTimeObject;
@@ -26,9 +29,11 @@ import cobrakai.com.miyagi.models.lyft.OAuth;
 import cobrakai.com.miyagi.models.miyagi.Hub;
 import cobrakai.com.miyagi.models.uber.UberPrice;
 import cobrakai.com.miyagi.utils.Constants;
+import cobrakai.com.miyagi.views.adapters.LocationAdapter;
 import retrofit.RestAdapter;
 import retrofit.http.GET;
 import retrofit.http.Path;
+import retrofit2.Call;
 import retrofit2.GsonConverterFactory;
 import retrofit2.Retrofit;
 import retrofit2.RxJavaCallAdapterFactory;
@@ -39,6 +44,7 @@ import retrofit2.http.Query;
 import rx.Observable;
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Action1;
 import rx.functions.Func1;
 import rx.schedulers.Schedulers;
 
@@ -76,7 +82,7 @@ public class Webservice {
         return service;
     }
 
-    public static void fetchUberPrice(){
+    public static void fetchFareEstimate(){
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(Constants.LYFT_BASE_URL)
                 .addConverterFactory(GsonConverterFactory.create())
@@ -123,7 +129,43 @@ public class Webservice {
                 });
     }
 
+    public static void fetchEstimatedCost(String startLat, String startLng, String endLat, String endLng){
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(Constants.LYFT_BASE_URL)
+                .addConverterFactory(GsonConverterFactory.create())
+                .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
+                .build();
+
+        Webservice.Get webservice = retrofit.create(Webservice.Get.class);
+
+        Observable<CostEstimates> estimatedCostRxCall = webservice.lyftCostEstimate(Constants.LYFT_ACCESS_TOKEN, startLat, startLng, endLat, endLng);
+        estimatedCostRxCall
+                .subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Subscriber<CostEstimates>() {
+                    @Override
+                    public void onCompleted() {
+                        Log.d(TAG, "onNext -- CostEstimates -- onCompleted -- ");
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        Log.d(TAG, "onNext -- CostEstimates -- onError -- " + e.toString());
+                    }
+
+                    @Override
+                    public void onNext(CostEstimates costEstimates) {
+                        Log.d(TAG, "onNext -- CostEstimates -- " + costEstimates.getCostEstimates().get(0).getPrimetimePercentage());
+                    }
+                });
+    }
+
     public static void fetchDriverUpdateLocation(final GoogleMap map, final BitmapDescriptor markerIcon, String accessToken) {
+
+        if(markers == null){
+            markers = new ArrayList<>();
+        }
+
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(Constants.LYFT_BASE_URL)
                 .addConverterFactory(GsonConverterFactory.create())
@@ -214,7 +256,6 @@ public class Webservice {
                     @Override
                     public void onCompleted() {
                         Log.d(TAG, "onCompleted -- START");
-
                     }
 
                     @Override
@@ -370,24 +411,29 @@ public class Webservice {
                                @Override
                                public void onNext(Hub[] hubs) {
                                    Log.d(TAG, "kreeseLocations -- START");
-                                   ArrayList<LatLng> latLngs = new ArrayList<>();
                                    for(Hub hub : hubs){
+                                       double lat = hub.getHubPoint().getCoordinates().get(1);
+                                       double lng = hub.getHubPoint().getCoordinates().get(0);
+
+                                       reverseGeoLoookup(map, kreeseIcon, lat, lng);
+
+                                       ArrayList<LatLng> latLngs = new ArrayList<>();
                                        List<List<Double>> coordinates = hub.getArea().getCoordinates().get(0);
                                        for(List<Double> doubles : coordinates) {
                                            Log.d(TAG, "kreeseLocations -- " + doubles.get(0).toString());
 
                                            latLngs.add(new LatLng(doubles.get(1), doubles.get(0)));
                                        }
+
+                                       LatLng[] latLngArray = new LatLng[latLngs.size()];
+                                       latLngArray = latLngs.toArray(latLngArray);
+                                       Iterable<LatLng> iterable = Arrays.asList(latLngArray);
+
+                                       Polygon polygon = map.addPolygon(new PolygonOptions()
+                                               .addAll(iterable)
+                                               .strokeColor(Color.RED)
+                                               .fillColor(Color.BLUE));
                                    }
-
-                                   LatLng[] latLngArray = new LatLng[latLngs.size()];
-                                   latLngArray = latLngs.toArray(latLngArray);
-                                   Iterable<LatLng> iterable = Arrays.asList(latLngArray);
-
-                                   Polygon polygon = map.addPolygon(new PolygonOptions()
-                                           .addAll(iterable)
-                                           .strokeColor(Color.RED)
-                                           .fillColor(Color.BLUE));
                                }
                            });
 
@@ -506,6 +552,36 @@ public class Webservice {
                 });
     }
 
+    public static void fetchLocation(final LocationAdapter locationAdapter, final String query, final double lat, final double lng) {
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(Constants.FOURSQURE_API_PREFIX)
+                .addConverterFactory(GsonConverterFactory.create())
+                .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
+                .build();
+
+        Webservice.Get webservice = retrofit.create(Webservice.Get.class);
+
+        String latlng = String.valueOf(lat) + "," + String.valueOf(lng); //Constants.MOCK_LAT + "," + Constants.MOCK_LNG;
+
+        Observable<ResponseHolder> reverseObservable = webservice.foursquareResponseRx(Constants.FOURSQUARE_CLIENT_ID, Constants.FOURSQUARE_CLIENT_SECRET, latlng, Constants.FOURSQUARE_VERSION, query);
+        reverseObservable
+                .subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .flatMap(new Func1<ResponseHolder, Observable<Venue>>() {
+                    @Override
+                    public Observable<Venue> call(ResponseHolder responseHolder) {
+                        return Observable.from(responseHolder.getResponse().getVenues());
+                    }
+                })
+                .forEach(new Action1<Venue>() {
+                    @Override
+                    public void call(Venue venue) {
+                        locationAdapter.addItem(venue);
+                        locationAdapter.notifyDataSetChanged();
+                    }
+                });
+    }
+
 
     public interface Post {
         @FormUrlEncoded
@@ -525,6 +601,15 @@ public class Webservice {
                 @Query("lng") String lng
         );
 
+        @retrofit2.http.GET(Constants.LYFT_DRIVERS_COST)
+        Observable<CostEstimates> lyftCostEstimate(
+                @Header("Authorization") String authorization,
+                @Query("start_lat") String startLat,
+                @Query("start_lng") String startLng,
+                @Query("end_lat") String endLat,
+                @Query("end_lng") String endLng
+                );
+
         @retrofit2.http.GET(Constants.LYFT_DRIVERS_LOCATION)
         Observable<NearbyDrivers> lyftDriversLocation(
                 @Header("Authorization") String authorization,
@@ -543,5 +628,8 @@ public class Webservice {
                 @Query("sensor") String sensor,
                 @Query("latlng") String latlng
         );
+
+        @retrofit2.http.GET("/v2/venues/search")
+        Observable<ResponseHolder> foursquareResponseRx(@Query("client_id") String client_id, @Query("client_secret") String client_secret, @Query("ll") String ll, @Query("v") String version, @Query("query") String query);
     }
 }

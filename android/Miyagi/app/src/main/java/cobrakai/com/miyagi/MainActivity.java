@@ -37,6 +37,7 @@ import java.util.ArrayList;
 
 import butterknife.InjectView;
 import cobrakai.com.miyagi.service.EnteringGeoFenceService;
+import cobrakai.com.miyagi.views.LocationActivity;
 import io.oauth.OAuthCallback;
 import io.oauth.OAuthData;
 import cobrakai.com.miyagi.utils.Constants;
@@ -46,9 +47,11 @@ import cobrakai.com.miyagi.views.ColorStrobeActivity;
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
+    private static final int REQUEST_DESTINATION = 0;
+
     private static final String TAG = MainActivity.class.getSimpleName();
     @InjectView(R.id.map_view) MapView miyagiMap;
-    @InjectView(R.id.request_ride_btn) Button miyagiButton;
+    @InjectView(R.id.request_ride_btn) Button miyagiRequestButton;
     @InjectView(R.id.miyagi_fab) FloatingActionButton miyagiFAB;
 
     ArrayList<String> miyagiQuotes;
@@ -168,8 +171,8 @@ public class MainActivity extends AppCompatActivity
                     map.setMapType(GoogleMap.MAP_TYPE_NORMAL);
 
 //                    Webservice.fetchDriverInitialLocation(map, hubIcon, Constants.LYFT_ACCESS_TOKEN);
-                    Webservice.fetchMockHubLocation(map, hubIcon, Constants.LYFT_ACCESS_TOKEN);
-                    Webservice.fetchKreeseLocation(map, markerIcon, MainActivity.this);
+//                    Webservice.fetchMockHubLocation(map, hubIcon, Constants.LYFT_ACCESS_TOKEN);
+                    Webservice.fetchKreeseLocation(map, hubIcon, MainActivity.this);
                     Webservice.testMyLocalHost();
 
                     CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(
@@ -179,7 +182,6 @@ public class MainActivity extends AppCompatActivity
                     map.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
                         @Override
                         public void onInfoWindowClick(Marker marker) {
-
                             Intent geofenceServiceIntent = new Intent(MainActivity.this, EnteringGeoFenceService.class);
                             startService(geofenceServiceIntent);
 
@@ -225,7 +227,7 @@ public class MainActivity extends AppCompatActivity
         Typeface face=Typeface.createFromAsset(getAssets(),
                 "fonts/Roboto-Bold.ttf");
 
-        miyagiButton.setTypeface(face);
+        miyagiRequestButton.setTypeface(face);
     }
 
     private void setupListeners(){
@@ -243,6 +245,15 @@ public class MainActivity extends AppCompatActivity
                 Webservice.fetchDriverUpdateLocation(MainActivity.map, markerIcon, Constants.LYFT_ACCESS_TOKEN);
             }
         });
+
+
+        miyagiRequestButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this, LocationActivity.class);
+                startActivityForResult(intent, REQUEST_DESTINATION);
+            }
+        });
     }
 
     private void setupMiyagiQuotes(){
@@ -250,5 +261,23 @@ public class MainActivity extends AppCompatActivity
         miyagiQuotes.add("First learn stand, then learn fly. Nature rule Daniel son, not mine");
         miyagiQuotes.add("Never put passion in front of principle, even if you win, you’ll lose");
         miyagiQuotes.add("It’s ok to lose to opponent. It’s never okay to lose to fear");
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        Log.d(TAG, "onActivityResult -- START -- " + resultCode);
+
+        if (resultCode == RESULT_OK) {
+            switch (requestCode) {
+                case REQUEST_DESTINATION:
+                    Log.d(TAG, "onActivityResult -- START - " + data.getStringExtra("name"));
+                    Log.d(TAG, "onActivityResult -- START - " + data.getDoubleExtra("lng", 0));
+                    Log.d(TAG, "onActivityResult -- START - " + data.getDoubleExtra("lat", 0));
+
+                    Webservice.fetchEstimatedCost(Constants.MOCK_LAT, Constants.MOCK_LAT, String.valueOf(data.getDoubleExtra("lng", 0)), String.valueOf(data.getDoubleExtra("lat", 0)));
+                    break;
+                default:
+            }
+        }
     }
 }
