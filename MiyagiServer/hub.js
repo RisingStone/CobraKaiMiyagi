@@ -6,6 +6,7 @@ var Schema = mongoose.Schema;
 var HubModel = function() {
   var HubSchema = new Schema({
     name: String,
+    visible: Boolean,
     area: {
     	type: { type: String },
     	coordinates: { type: Array }

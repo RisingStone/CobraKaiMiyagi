@@ -42,4 +42,13 @@ router.get('/', function(req, res, next) {
 	}
 });
 
+router.post('/', function(req, res, next) {
+	console.log('Creating hub...');
+	var newHub = new Hub(req.body);
+	newHub.save(function(err) {
+		if(err) res.send(500, err);
+		else res.json(req.body);
+	});
+});
+
 module.exports = router;

@@ -1,6 +1,7 @@
 [
   {
     "name": "Club Hub",
+    "visible": true,
     "area": {
         "type": "Polygon",
         "coordinates": [
