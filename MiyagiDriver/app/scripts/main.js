@@ -1,22 +1,29 @@
-window.onload = function(){
-	getDriverLocation();
-}
+jQuery.support.cors = true;
 
 var map;
 var driverid;
+var hubId = "56d35a97e6087451433f0ecb";
+var hubList;
+var hub;
+
+var shouldLoop = true;
+
+var serverIP = "http://192.168.11.133:3000";
 
 var createdDriver = false;
 
+var driverId;
+
 var driver = {
-	name: "",
-	visible: true,
+	name: "Driver",
 	location: {
-		type: "Point",
-		coordinates: [37.807798, -122.431253]
+		"type": "Point",
+		"coordinates": [
+			-122.3944,
+			37.7960
+		]
 	}
 }
-
-var hub;
 
 function initMap() {
 	var myLatlng = new google.maps.LatLng(driver.location.coordinates[0], driver.location.coordinates[1]);
@@ -52,17 +59,10 @@ function updatePostion(position) {
 	console.log(position.coords);
 	
 	//Do driver related reg
-	driver.location.coordinates = [position.coords.latitude,position.coords.longitude]; 
+	driver.location.coordinates = [position.coords.longitude,position.coords.latitude]; 
 	
 	//UpdateMap
 	updateMap(driver.location);
-	
-	//See if we made a driver yet, if not, make one
-	if(!createdDriver){
-		createDriver();
-		registerDriver(driver);
-	}else{
-	}
 }
 
 function showError(error) {
@@ -86,10 +86,25 @@ function showError(error) {
 function updateMap(location){
 	var myLatlng = new google.maps.LatLng(location.coordinates[0], location.coordinates[1]);
 	map.panTo(myLatlng);
+	
+	//Show marker
+	var marker = new google.maps.Marker({
+		animation: google.maps.Animation.DROP,
+		labal : '(You)',
+		position: myLatlng,
+		map: map,
+		title: ' <- YOU'
+	});
 }
 
-function createDriver(){
-	driver.name = makeName();
+function createDriver() {
+	//See if we made a driver yet, if not, make one
+	if(!createdDriver){
+		driver.name = makeName();
+		registerDriver(driver);
+	}else{
+		console.log(driver.name + " already created!");
+	}
 	
 	//Debug
 	console.log(driver);
@@ -97,12 +112,15 @@ function createDriver(){
 
 function registerDriver(driver){
 	console.log(driver);
-		
-	// Using the core $.ajax() method
+
 	$.ajax({
 
 		// The URL for the request
-		url: "http://192.168.11.132:3000/drivers",
+		url: serverIP + "/drivers",
+		
+		headers: {
+			'Content-Type':'application/json'
+		},
 	
 		// The data to send 
 		data : driver,
@@ -116,6 +134,52 @@ function registerDriver(driver){
 		// Code to run if the request succeeds;
 		// the response is passed to the function
 		success: function( json ) {
+			createdDriver = true;
+			
+			driverId = json[0];
+			
+			console.log('DriverID: ' + driverId);
+		},
+	
+		// Code to run if the request fails; the raw request and
+		// status codes are passed to the function
+		error: function( xhr, status, errorThrown ) {
+			console.error("Sorry, there was a problem!");
+		},
+	
+		// Code to run regardless of success or failure
+		complete: function( xhr, status ) {
+		}
+	});
+}
+
+function queryHub(id){
+	console.log("query hub : " + id);
+		
+	// Using the core $.ajax() method
+	$.ajax({
+
+		// The URL for the request
+		url: serverIP + "/hubs/" + id,
+	
+		// Whether this is a POST or GET request
+		type: "GET",
+		
+		headers: {
+			'Content-Type':'application/json'
+		},
+	
+		// The type of data we expect back
+		dataType : "json",
+	
+		// Code to run if the request succeeds;
+		// the response is passed to the function
+		success: function( json ) {
+			
+			hub = json;
+			
+			updateQueue(hub);
+			
 			console.log(json);
 		},
 	
@@ -131,13 +195,14 @@ function registerDriver(driver){
 	});
 }
 
-function queryHub(){
-		
+function queryHubList(){
+	console.log("queryHubList:");
+	
 	// Using the core $.ajax() method
 	$.ajax({
 
 		// The URL for the request
-		url: "http://192.168.11.132:3000/drivers",
+		url: serverIP + "/hubs",
 	
 		// Whether this is a POST or GET request
 		type: "GET",
@@ -148,6 +213,7 @@ function queryHub(){
 		// Code to run if the request succeeds;
 		// the response is passed to the function
 		success: function( json ) {
+			updateHubs(json);
 			console.log(json);
 		},
 	
@@ -161,6 +227,31 @@ function queryHub(){
 		complete: function( xhr, status ) {
 		}
 	});
+}
+
+function updateHubs(json){
+	console.log(json);
+	
+	hubList = json;
+	
+	for(var i = 0; i < hubList.length; i++){
+		addHubMarker(hubList[i]);
+	}
+}
+
+function addHubMarker(hub){
+		var myLatlng = new google.maps.LatLng(hub.hub.coordinates[1], hub.hub.coordinates[0]);
+		
+		console.log("New Hub Marker: " + hub.hub.coordinates[1] + ":" + hub.hub.coordinates[0]);
+	
+		//Show marker
+		var marker = new google.maps.Marker({
+			animation: google.maps.Animation.DROP,
+			labal : 'Kreese',
+			position: myLatlng,
+			map: map,
+			title: hub.name
+		});
 }
 
 function createAlertRideAccept(){
@@ -187,50 +278,82 @@ function createAlertRideAccept(){
 		$('.btn.btn-success').on('click', function () {
 			acceptRide();
 		})
-		
-		$('.alert').on('close.bs.alert', function () {
-			rejectRide();
-		})
 }
 
 function rejectRide(){
 	$('.close').alert('close');
+	
+	//dequeue driver
 	
 	console.log('Ride rejected!');
 }
 
 function acceptRide(){
 	$('.close').alert('close');
+	
+	//dequeue rider and driver
 
 	console.log('Ride accepted!');	
 }
 
 var iconIds = ["first", "second", "third", "fourth", "fifth", "sixth", "seventh", "eighth", "ninth", "tenth"];
 
-function updateQueue(){
-	for(var i = 0; i < iconIds.length; i++){
-		
-		//Check hub position of i.
-		var hubDriverPositon;
-		var hubRiderPostion;
-		
-		//Update riders
-		$('#r'+iconIds[i]).text('rider');
-		
-		//Update drivers
-		$('#d'+iconIds[i]).text('driver');	
+function updateQueue(json){
+	
+	hub = json;
+	
+	for(var i = 0; i < hub.riders.length; i++){
+		var hubRiderPostion = hub.riders[i];
+		$('#r'+iconIds[i]).text(hubDriverPositon.name);
+	}
+			
+	for(var i = 0; i < hub.drivers.length; i++){
+		var hubDriverPositon = hub.drivers[i];
+		$('#d'+iconIds[i]).text(hubRiderPostion.name);	
 	}
 	
 	//Check hub driver position 1, if it's our ID, then let's put up an accept thing
-	if(hub.riderQueue.id == driver.name){
+	if(hub.riders == driver.name){
 		createAlertRideAccept();
 	}
 }
 
-function mainLoop() {
-    console.log("10 seconds");
-	updateQueue();
-    setTimeout(mainLoop, 250);
-}
+$('#location').on('click', function () {
+	console.log('Location btn pressed');
+	
+	getDriverLocation();
+});
 
-setTimeout(mainLoop, 250);
+$('#register').on('click', function () {
+	console.log('Location btn pressed');
+	
+	createDriver();
+});
+
+$('#enter').on('click', function () {
+	console.log('Location btn pressed');
+});
+
+$('#leave').on('click', function () {
+	console.log('Location btn pressed');
+});
+
+$('#hubs').on('click', function () {
+	//Get a list of hubs
+	queryHubList();
+});
+
+$('#hub').on('click', function () {
+	shouldLoop = true;
+	setTimeout(mainLoop, 2000);
+});
+
+$('#stop').on('click', function () {
+	shouldLoop = false;
+});
+
+function mainLoop() {
+	queryHub(hubList[0]._id);
+	if(shouldLoop)
+		setTimeout(mainLoop, 2000);
+}
