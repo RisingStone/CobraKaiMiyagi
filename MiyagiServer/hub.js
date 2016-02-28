@@ -7,6 +7,7 @@ var HubModel = function() {
   var HubSchema = new Schema({
     name: String,
     visible: Boolean,
+    riders: { type: Array },
     area: {
     	type: { type: String },
     	coordinates: { type: Array }
