@@ -36,6 +36,7 @@ mongoose.connect('mongodb://localhost/miyagi_db', function(err) {
   });
   */
 
+  /*
   // load driver data from file and transform it to Object
   var hubdata = JSON.parse(fs.readFileSync(path.join(__dirname, 'hubs.json'), 'utf8'));
 
@@ -48,6 +49,7 @@ mongoose.connect('mongodb://localhost/miyagi_db', function(err) {
       if (err) throw err;
     });
   });
+*/
 });
 
 var allowCrossDomain = function(req, res, next) {
