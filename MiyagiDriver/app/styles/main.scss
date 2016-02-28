@@ -90,4 +90,15 @@ body {
   .jumbotron {
     border-bottom: 0;
   }
+  
+  #map {
+	position: absolute;
+	height: 100%;
+	width: 80%;
+    right: 0px;
+  }
+  
+  #output {
+	position: absolute;
+  }
 }
