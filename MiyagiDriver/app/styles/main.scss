@@ -4,6 +4,13 @@ $icon-font-path: "../bower_components/bootstrap-sass/assets/fonts/bootstrap/";
 @import "bower_components/bootstrap-sass/assets/stylesheets/_bootstrap.scss";
 // endbower
 
+html, body {
+	height: 100%;
+	margin: 0;
+	padding: 0;
+	background: #0099cc;
+}
+
 .browsehappy {
   margin: 0.2em 0;
   background: #ccc;
@@ -97,8 +104,28 @@ body {
 	width: 80%;
     right: 0px;
   }
-  
-  #output {
-	position: absolute;
-  }
+
+	#alert_placeholder{
+		width: 20%;
+	}
+	
+	#driverQueue {
+		position: absolute;	
+		top: 350px;
+		left: 200px;
+	}
+	
+	#riderQueue {
+		position: absolute;	
+		top: 350px;
+		left: 100px;
+	}
+	
+	.queuePosition {
+		height: 35px;
+		width: 35px;
+		border-style: solid;
+		border-width: 2px;
+		border-radius: 30px;
+	}
 }
