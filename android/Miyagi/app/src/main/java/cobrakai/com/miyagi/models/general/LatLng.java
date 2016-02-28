@@ -1,4 +1,4 @@
-package cobrakai.com.miyagi.models.lyft;
+package cobrakai.com.miyagi.models.general;
 
 import com.google.gson.annotations.SerializedName;
 
