@@ -32,6 +32,8 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 
 import butterknife.InjectView;
+import io.oauth.OAuthCallback;
+import io.oauth.OAuthData;
 import cobrakai.com.miyagi.utils.Constants;
 import cobrakai.com.miyagi.utils.Helper;
 import cobrakai.com.miyagi.views.ColorStrobeActivity;
@@ -63,8 +65,13 @@ public class MainActivity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-        Webservice.fetchGithub();
-        Auth.getAuthToken(this);
+        Auth.getUberAuthToken(this, new OAuthCallback() {
+            @Override
+            public void onFinished(OAuthData data) {
+                Log.d(TAG, "Toke: " + data.token);
+            }
+        });
+
         setupMiyagiMap(savedInstanceState);
 
         markerIcon = BitmapDescriptorFactory.fromResource(R.drawable.car);
