@@ -27,6 +27,7 @@ import cobrakai.com.miyagi.models.lyft.Locations;
 import cobrakai.com.miyagi.models.lyft.NearbyDrivers;
 import cobrakai.com.miyagi.models.lyft.OAuth;
 import cobrakai.com.miyagi.models.miyagi.Hub;
+import cobrakai.com.miyagi.models.miyagi.OK;
 import cobrakai.com.miyagi.models.uber.UberPrice;
 import cobrakai.com.miyagi.utils.Constants;
 import cobrakai.com.miyagi.views.adapters.LocationAdapter;
@@ -594,11 +595,11 @@ public class Webservice {
 
         Webservice.Post webservice = retrofit.create(Webservice.Post.class);
 
-        Observable<String> reverseObservable = webservice.queRider("application/json", hubid, "riders", id);
+        Observable<OK> reverseObservable = webservice.queRider("application/json", hubid, "riders", id);
         reverseObservable
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Subscriber<String>() {
+                .subscribe(new Subscriber<OK>() {
                     @Override
                     public void onCompleted() {
                         Log.d(TAG, "onCompleted -- onError");
@@ -606,11 +607,11 @@ public class Webservice {
 
                     @Override
                     public void onError(Throwable e) {
-                        Log.d(TAG, "queRider -- onError");
+                        Log.d(TAG, "queRider -- onError -- " + e.toString());
                     }
 
                     @Override
-                    public void onNext(String s) {
+                    public void onNext(OK s) {
                         Log.d(TAG, "queRider -- onNext");
                     }
                 });
@@ -627,11 +628,11 @@ public class Webservice {
         );
 
         @retrofit2.http.POST(Constants.MIYAGI_API_HUBS_QUE_PERSON)
-        Observable<String> queRider(
+        Observable<OK> queRider(
                 @Header("Content-Type") String contentType,
-                @Path("hubid") String hubId,
-                @Path("ridertype") String riderType,
-                @Path("id") String id
+                @retrofit2.http.Path("hubid") String hubId,
+                @retrofit2.http.Path("ridertype") String riderType,
+                @retrofit2.http.Path("id") String id
         );
     }
 

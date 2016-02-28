@@ -53,6 +53,8 @@ public class EnteringGeoFenceService extends Service {
         Log.d(TAG, "onStartCommand -- START");
 
         final String hubId = intent.getStringExtra("hubId");
+
+        Log.d(TAG, "hubId: " + hubId);
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
