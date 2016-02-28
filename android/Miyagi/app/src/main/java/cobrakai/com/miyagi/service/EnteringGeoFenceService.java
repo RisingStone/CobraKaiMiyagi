@@ -49,13 +49,16 @@ public class EnteringGeoFenceService extends Service {
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-                Log.d(TAG, "Bring app back to forground");
-                Intent intent = new Intent(getApplicationContext(), ColorStrobeActivity.class);
-                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_ACTIVITY_SINGLE_TOP);
-                startActivity(intent);
+//                Log.d(TAG, "Bring app back to forground");
+//                Intent intent = new Intent(getApplicationContext(), ColorStrobeActivity.class);
+//                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_ACTIVITY_SINGLE_TOP);
+//                startActivity(intent);
+
+                //Enter geofence after 15 seconds
+
                 stopSelf();
             }
-        }, 20000);
+        }, 15000);
     }
 
     @Override

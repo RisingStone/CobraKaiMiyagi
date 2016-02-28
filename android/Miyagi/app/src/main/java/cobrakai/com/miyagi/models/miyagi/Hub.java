@@ -19,6 +19,18 @@ public class Hub {
     @Expose
     private Area area;
 
+    @SerializedName("hub")
+    @Expose
+    private HubPoint hubPoint;
+
+    public HubPoint getHubPoint() {
+        return hubPoint;
+    }
+
+    public void setHubPoint(HubPoint hubPoint) {
+        this.hubPoint = hubPoint;
+    }
+
     /**
      * 
      * @return
